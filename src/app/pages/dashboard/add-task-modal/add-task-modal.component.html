@@ -1,0 +1,63 @@
+<!-- add-task-modal.component.html -->
+<div class="modal-backdrop" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add New Task</h2>
+      <button class="close-button" (click)="onClose()">×</button>
+    </div>
+
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Task Title *</label>
+        <input
+          type="text"
+          formControlName="title"
+          placeholder="Enter task title"
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea
+          formControlName="description"
+          rows="3"
+          placeholder="Enter task description (optional)"
+          class="form-control"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Due Date</label>
+        <input
+          type="date"
+          formControlName="dueDate"
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Assign To</label>
+        <select formControlName="assignedToId" class="form-control">
+          <option value="">Select a user</option>
+          <option *ngIf="loading" disabled>Loading users...</option>
+          <option
+            *ngFor="let user of uniqueUsers"
+            [value]="user.id"
+          >
+            {{ user.username }} ({{ user.role }})
+          </option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="onClose()">
+          Cancel
+        </button>
+        <button type="submit" class="btn-submit">
+          Create Task
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

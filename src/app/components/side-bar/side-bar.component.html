@@ -1,0 +1,66 @@
+<div class="sidebar" [class.collapsed]="collapsed">
+  <nav class="nav">
+    <ul>
+      <li class="nav-item">
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+          <i class="icon lucide-home"></i>
+          <span *ngIf="!collapsed" class="text">Dashboard</span>
+        </a>
+      </li>
+
+      <li *ngIf="isManager" class="nav-item">
+        <a routerLink="/dashboard/users" routerLinkActive="active" class="nav-link">
+          <i class="icon lucide-users"></i>
+          <span *ngIf="!collapsed" class="text">Members</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/dashboard/calendar" class="nav-link">
+          <i class="icon lucide-calendar"></i>
+          <span *ngIf="!collapsed" class="text">Calendar</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/dashboard/chat" class="nav-link">
+          <i class="icon lucide-message-circle"></i>
+          <span *ngIf="!collapsed" class="text">Chat</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/dashboard/notes" class="nav-link">
+          <i class="icon lucide-notebook-pen"></i>
+          <span *ngIf="!collapsed" class="text">Notes</span>
+        </a>
+      </li>
+
+      <li *ngIf="isManager" class="nav-item">
+        <a routerLink="/dashboard/history" class="nav-link">
+          <i class="icon lucide-history"></i>
+          <span *ngIf="!collapsed" class="text">History</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/dashboard/taches" class="nav-link">
+          <i class="icon lucide-list-todo"></i>
+          <span *ngIf="!collapsed" class="text">Tasks</span>
+        </a>
+      </li>
+
+      <li class="nav-item" (click)="handleLogout()">
+        <div class="nav-link">
+          <i class="icon lucide-log-out"></i>
+          <span *ngIf="!collapsed" class="text">Logout</span>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="collapse-btn" (click)="toggleSidebar()">
+    <i *ngIf="!collapsed" class="lucide-chevron-left"></i>
+    <i *ngIf="collapsed" class="lucide-chevron-right"></i>
+  </div>
+</div>
