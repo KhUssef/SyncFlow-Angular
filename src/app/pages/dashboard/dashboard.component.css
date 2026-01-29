@@ -64,7 +64,7 @@
 
 .chart-container {
   background-color: #ffffff;
-  border-radius: 0;
+  border-radius: 16px;
   padding: 1.5rem;
   margin-bottom: 2rem;
   border: 2px solid #000000;
@@ -86,7 +86,7 @@
   margin-top: 2rem;
   background-color: #ffffff;
   padding: 1.5rem 2rem;
-  border: 1px solid #e0e0e0;
+   border: 2px solid #000000;
   border-radius: 16px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.3s ease;
@@ -100,7 +100,7 @@
   font-size: 1.5rem;
   margin-bottom: 1rem;
   color: #333333;
-  border-bottom: 2px solid #f0f0f0;
+  
   padding-bottom: 0.5rem;
 }
 
@@ -113,7 +113,7 @@
 .today-section li {
   padding: 1rem;
   margin-bottom: 0.5rem;
-  border: 1px solid #f0f0f0;
+   border: 2px solid #000000;
   border-radius: 10px;
   background-color: #f9f9f9;
   transition: background-color 0.2s ease;

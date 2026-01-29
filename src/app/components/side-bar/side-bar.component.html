@@ -3,56 +3,63 @@
     <ul>
       <li class="nav-item">
         <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
-          <i class="icon lucide-home"></i>
+          <mat-icon class="icon">home</mat-icon>
           <span *ngIf="!collapsed" class="text">Dashboard</span>
         </a>
       </li>
 
       <li *ngIf="isManager" class="nav-item">
-        <a routerLink="/dashboard/users" routerLinkActive="active" class="nav-link">
-          <i class="icon lucide-users"></i>
+        <a routerLink="/users" routerLinkActive="active" class="nav-link">
+          <mat-icon class="icon">people</mat-icon>
           <span *ngIf="!collapsed" class="text">Members</span>
         </a>
       </li>
 
       <li class="nav-item">
-        <a routerLink="/dashboard/calendar" class="nav-link">
-          <i class="icon lucide-calendar"></i>
+        <a routerLink="/calendar" routerLinkActive="active" class="nav-link">
+          <mat-icon class="icon">calendar_today</mat-icon>
           <span *ngIf="!collapsed" class="text">Calendar</span>
         </a>
       </li>
 
       <li class="nav-item">
-        <a routerLink="/dashboard/chat" class="nav-link">
-          <i class="icon lucide-message-circle"></i>
+        <a routerLink="/chat" class="nav-link">
+          <mat-icon class="icon">chat</mat-icon>
           <span *ngIf="!collapsed" class="text">Chat</span>
         </a>
       </li>
 
       <li class="nav-item">
-        <a routerLink="/dashboard/notes" class="nav-link">
-          <i class="icon lucide-notebook-pen"></i>
+        <a routerLink="/notes" class="nav-link">
+          <mat-icon class="icon">note</mat-icon>
           <span *ngIf="!collapsed" class="text">Notes</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/tasks" routerLinkActive="active" class="nav-link">
+          <mat-icon class="icon">assignment</mat-icon>
+          <span *ngIf="!collapsed" class="text">Tasks</span>
         </a>
       </li>
 
       <li *ngIf="isManager" class="nav-item">
         <a routerLink="/dashboard/history" class="nav-link">
-          <i class="icon lucide-history"></i>
+          <mat-icon class="icon">history</mat-icon>
           <span *ngIf="!collapsed" class="text">History</span>
         </a>
       </li>
 
       <li class="nav-item">
-        <a routerLink="/dashboard/taches" class="nav-link">
-          <i class="icon lucide-list-todo"></i>
-          <span *ngIf="!collapsed" class="text">Tasks</span>
+        <a routerLink="/taches" class="nav-link">
+          <mat-icon class="icon">checklist</mat-icon>
+          <span *ngIf="!collapsed" class="text">Todos</span>
         </a>
       </li>
 
       <li class="nav-item" (click)="handleLogout()">
         <div class="nav-link">
-          <i class="icon lucide-log-out"></i>
+          <mat-icon class="icon">logout</mat-icon>
           <span *ngIf="!collapsed" class="text">Logout</span>
         </div>
       </li>
@@ -60,7 +67,7 @@
   </nav>
 
   <div class="collapse-btn" (click)="toggleSidebar()">
-    <i *ngIf="!collapsed" class="lucide-chevron-left"></i>
-    <i *ngIf="collapsed" class="lucide-chevron-right"></i>
+    <mat-icon *ngIf="!collapsed">chevron_left</mat-icon>
+    <mat-icon *ngIf="collapsed">chevron_right</mat-icon>
   </div>
 </div>

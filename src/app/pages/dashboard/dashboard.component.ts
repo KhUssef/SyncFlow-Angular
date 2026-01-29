@@ -5,56 +5,10 @@ import { Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { AddTaskModalComponent } from './add-task-modal/add-task-modal.component';
-
-interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  dueDate?: string;
-  completed: boolean;
-  assignedTo?: {
-    id: string;
-    username: string;
-  };
-}
-
-interface Event {
-  id: string;
-  title: string;
-  description?: string;
-  date: string;
-  createdBy: {
-    id: string;
-    username: string;
-  };
-}
-
-interface User {
-  id: string;
-  username: string;
-  role: string;
-  deletedAt?: string;
-}
-
-interface Stats {
-  totalTasks: number;
-  completedTasks: number;
-  pendingTasks: number;
-  completionRate: number;
-}
-
-interface ChartData {
-  date: string;
-  displayDate: string;
-  tasksCompleted: number;
-  totalTasks: number;
-  isToday: boolean;
-}
-
-interface ChartSeries {
-  name: string;
-  series: Array<{ name: string; value: number }>;
-}
+import { Task } from '../../models/task.model';
+import { Event } from '../../models/event.model';
+import { User } from '../../models/user.model';
+import { Stats, ChartData, ChartSeries } from '../../models/stats.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -129,9 +83,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     // Mock users
     this.users = [
-      { id: '1', username: 'John Doe', role: 'employee' },
-      { id: '2', username: 'Jane Smith', role: 'manager' },
-      { id: '3', username: 'Bob Johnson', role: 'employee' }
+      {
+        id: '1', username: 'John Doe', role: 'USER',
+        email: '',
+        status: 'Active',
+        company: ''
+      },
+      {
+        id: '2', username: 'Jane Smith', role: 'MANAGER',
+        email: '',
+        status: 'Active',
+        company: ''
+      },
+      {
+        id: '3', username: 'Bob Johnson', role: 'USER',
+        email: '',
+        status: 'Active',
+        company: ''
+      }
     ];
 
     // Mock today's tasks
@@ -316,7 +285,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   isEventCreatedByMe(event: Event): boolean {
-    return event.createdBy?.id === this.user?.id;
+    return event.createdBy === this.user?.id;
   }
 
   formatTime(dateString: string): string {

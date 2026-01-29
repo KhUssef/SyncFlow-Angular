@@ -2,12 +2,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-
-interface User {
-  id: string;
-  username: string;
-  role: string;
-}
+import { User } from '../../../models/user.model';
 
 @Component({
   selector: 'app-add-task-modal',

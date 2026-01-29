@@ -1,0 +1,94 @@
+<div class="pageContainer">
+  <div class="mainContainer">
+    <!-- Main Tasks Card -->
+    <div class="card">
+      <div class="cardHeader">
+        <h1 class="mainTitle">My Tasks</h1>
+        <p class="welcomeText">Welcome, {{ username }}! Here are your assigned tasks.</p>
+      </div>
+
+      <div class="cardContent">
+        <!-- Empty State -->
+        <div *ngIf="tasks.length === 0" class="emptyState">
+          <h2 class="emptyTitle">No tasks assigned</h2>
+          <p class="emptyText">You don't have any tasks assigned to you yet.</p>
+        </div>
+
+        <!-- Tasks List -->
+        <div *ngIf="tasks.length > 0" class="tasksList">
+          <div
+            *ngFor="let task of tasks"
+            [ngClass]="['taskItem', getTaskItemClass(task)]"
+          >
+            <div class="taskContent">
+              <!-- Task Left Section -->
+              <div class="taskLeft">
+                <input
+                  type="checkbox"
+                  [checked]="task.completed"
+                  (change)="toggleTaskCompletion(task.id)"
+                  class="checkbox"
+                  [attr.aria-label]="'Toggle completion for ' + task.title"
+                />
+                <div class="taskDetails">
+                  <h3
+                    [ngClass]="{
+                      taskTitle: true,
+                      taskTitleCompleted: task.completed
+                    }"
+                  >
+                    {{ task.title }}
+                  </h3>
+                  <p
+                    *ngIf="task.description"
+                    [ngClass]="{
+                      taskDescription: true,
+                      taskDescriptionCompleted: task.completed
+                    }"
+                  >
+                    {{ task.description }}
+                  </p>
+                  <div class="taskMeta">
+                    <span>Due: {{ formatDate(task.dueDate) }}</span>
+                    <span *ngIf="task.company">Company: {{ task.company.name }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Status Badge -->
+              <div
+                [ngClass]="['statusBadge', getStatusBadgeClass(task)]"
+              >
+                {{ getTaskStatus(task) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task Statistics Card -->
+    <div class="statsCard">
+      <h2 class="statsTitle">Task Statistics</h2>
+      <div class="statsGrid">
+        <!-- Total Tasks -->
+        <div class="statItem statTotal">
+          <h3 class="statLabel">Total Tasks</h3>
+          <p class="statValue">{{ tasks.length }}</p>
+        </div>
+
+        <!-- Completed Tasks -->
+        <div class="statItem statCompleted">
+          <h3 class="statLabel">Completed</h3>
+          <p class="statValue">{{ completedTasksCount }}</p>
+        </div>
+
+        <!-- Pending Tasks -->
+        <div class="statItem statPending">
+          <h3 class="statLabel">Pending</h3>
+          <p class="statValue">{{ pendingTasksCount }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

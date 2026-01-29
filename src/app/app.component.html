@@ -1,6 +1,4 @@
-<div style="display: flex;">
-  <app-side-bar></app-side-bar>
-  <div style="flex: 1; width: 100%;">
-    <router-outlet></router-outlet>
-  </div>
+<app-side-bar (collapsedChange)="onSidebarCollapsed($event)"></app-side-bar>
+<div class="main-content" [class.collapsed]="isSidebarCollapsed">
+  <router-outlet></router-outlet>
 </div>

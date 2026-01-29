@@ -1,0 +1,106 @@
+<div class="container" (click)="handleClickOutside($event)">
+  <div class="header">
+    <h2>Collaborative Notes</h2>
+    <div [class]="'connectionStatus ' + (isConnected ? 'connected' : 'disconnected')">
+      {{ isConnected ? 'Connected' : 'Disconnected' }}
+    </div>
+    <div #styleMenuRef [class]="'styleMenu ' + (!getSelectedLineData() ? 'disabled' : '')">
+      <div class="menuLabel">
+        {{ getSelectedLineData() 
+            ? 'Editing Line ' + selectedLine 
+            : 'Select a line to edit styling'
+        }}
+      </div>
+
+      <div class="menuControl">
+        <label>Size</label>
+        <input
+          type="number"
+          min="8"
+          max="72"
+          [value]="getSelectedLineData()?.fontSize || 14"
+          (change)="handleStyleChange('fontSize', $event)"
+          class="menuInput"
+          [disabled]="!getSelectedLineData()"
+          style="width: 70px"
+        />
+      </div>
+
+      <div class="menuControl">
+        <label>Color</label>
+        <input
+          type="color"
+          [value]="getSelectedLineData()?.color || '#000000'"
+          (change)="handleStyleChange('color', $event)"
+          class="colorInput"
+          [disabled]="!getSelectedLineData()"
+        />
+      </div>
+
+      <div 
+        [class]="'highlightToggle ' + (getSelectedLineData()?.highlighted ? 'active' : '')"
+        (click)="getSelectedLineData() && handleStyleChange('highlighted', !getSelectedLineData()?.highlighted)"
+      >
+        <input
+          type="checkbox"
+          [checked]="getSelectedLineData()?.highlighted || false"
+          (change)="$event"
+          class="checkbox"
+          [disabled]="!getSelectedLineData()"
+        />
+        <span>Highlight</span>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error">
+    {{ error }}
+  </div>
+
+  <div class="noteLines">
+    <div *ngFor="let line of noteLines" 
+         [class]="'noteLine ' + 
+                  (getLineLockStatus(line.lineNumber).isLocked && !getLineLockStatus(line.lineNumber).isLockedByMe ? 'lockedLine' : '') +
+                  (selectedLine === line.lineNumber ? ' selected' : '') +
+                  (line.highlighted ? ' highlighted' : '')"
+         (click)="!getLineLockStatus(line.lineNumber).isLocked && handleLineFocus(line.lineNumber)">
+      
+      <div class="lineNumber">{{ line.lineNumber }}</div>
+
+      <div class="lineContent">
+        <textarea
+          #textarea
+          (afterViewInit)="registerTextareaRef(line.lineNumber, textarea)"
+          [style.fontSize]="line.fontSize + 'px'"
+          [style.color]="line.color"
+          class="textarea"
+          [value]="line.content"
+          [disabled]="!getLineLockStatus(line.lineNumber).canEdit"
+          [placeholder]="getLineLockStatus(line.lineNumber).isLocked && !getLineLockStatus(line.lineNumber).isLockedByMe
+            ? 'Locked by ' + getLineLockStatus(line.lineNumber).lockedBy
+            : 'Enter text...'"
+          (input)="handleContentChange(line.lineNumber, $any($event.target).value)"
+          (focus)="handleLineFocus(line.lineNumber)"
+        ></textarea>
+
+        <div *ngIf="getLineLockStatus(line.lineNumber).isLocked" class="lockIndicator">
+          {{ getLineLockStatus(line.lineNumber).isLockedByMe
+              ? 'Editing...'
+              : 'Locked by ' + getLineLockStatus(line.lineNumber).lockedBy
+          }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tips">
+    <p>Tips:</p>
+    <ul>
+      <li>Click on any line to start editing</li>
+      <li>Use the style menu to change size, color, and highlighting</li>
+      <li>Changes are saved automatically</li>
+      <li>Click outside the current line to unlock</li>
+      <li>Green background = currently selected by you</li>
+    </ul>
+  </div>
+</div>

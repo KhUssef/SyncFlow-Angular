@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { LucideAngularModule, Home, Users } from 'lucide-angular';
+import { MatIconModule } from '@angular/material/icon';
 
 interface User {
   id: string;
@@ -14,12 +14,15 @@ interface User {
 @Component({
   selector: 'app-side-bar',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, RouterLink, MatIconModule],
   templateUrl: './side-bar.component.html',
-  styleUrl: './side-bar.component.css'
+  styleUrl: './side-bar.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SideBarComponent implements OnInit, OnDestroy {
   collapsed = false;
+  @Output() collapsedChange = new EventEmitter<boolean>();
+  
   user: User | null = {
     id: '1',
     username: 'John Doe',
@@ -35,6 +38,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   toggleSidebar() {
     this.collapsed = !this.collapsed;
+    this.collapsedChange.emit(this.collapsed);
   }
 
   handleLogout() {

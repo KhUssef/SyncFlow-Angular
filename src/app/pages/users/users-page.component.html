@@ -1,0 +1,249 @@
+<div class="users-container">
+  <!-- Header -->
+  <header class="header">
+    <div>
+      <h1>USERS MANAGEMENT</h1>
+      <p>Manage your application users</p>
+    </div>
+    <div class="header-actions">
+      <button 
+        *ngIf="isManager && !showDeleted"
+        class="add-button"
+        (click)="openAddUserModal()"
+      >
+        + ADD USER
+      </button>
+    </div>
+  </header>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="search-container">
+      <input
+        type="text"
+        placeholder="Search users..."
+        class="search-input"
+        [value]="searchTerm"
+        (input)="onSearchChange($any($event.target).value)"
+      />
+    </div>
+
+    <div class="filter-container">
+      <select
+        class="role-filter"
+        [value]="selectedRole"
+        (change)="onRoleChange($any($event.target).value)"
+      >
+        <option value="">All Roles</option>
+        <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+      </select>
+    </div>
+
+    <div class="toggle-container">
+      <label class="toggle-label">
+        <input
+          type="checkbox"
+          class="toggle-input"
+          [checked]="showDeleted"
+          (change)="onShowDeletedChange($any($event.target).checked)"
+        />
+        <span class="toggle-slider"></span>
+        Show Deleted Users
+      </label>
+    </div>
+  </div>
+
+  <!-- Users Grid -->
+  <div class="users-grid">
+    <div *ngIf="filteredUsers.length === 0" class="no-results">
+      No {{ showDeleted ? 'deleted' : 'active' }} users found
+    </div>
+
+    <div *ngFor="let user of filteredUsers" class="user-card">
+      <div class="card-header">
+        <h2 class="user-name">{{ user.username }}</h2>
+        <span class="status-badge" [ngClass]="user.status.toLowerCase()">
+          {{ user.status }}
+        </span>
+      </div>
+
+      <div class="card-body">
+        <div class="user-info">
+          <div class="info-item">
+            <span class="info-label">EMAIL</span>
+            <span class="info-value">{{ user.email }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">ROLE</span>
+            <span class="badge" [ngClass]="user.role.toLowerCase()">
+              {{ user.role }}
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">COMPANY</span>
+            <span class="info-value">{{ user.company }}</span>
+          </div>
+          <div *ngIf="showDeleted && user.deletedAt" class="info-item">
+            <span class="info-label">DELETED AT</span>
+            <span class="info-value">{{ user.deletedAt | date: 'shortDate' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <ng-container *ngIf="isManager">
+          <ng-container *ngIf="user.status === 'Active'">
+            <button
+              class="edit-button"
+              (click)="openEditUserModal(user)"
+              [disabled]="!canEditOrDelete(user)"
+            >
+              EDIT
+            </button>
+            <button
+              class="delete-button"
+              (click)="handleDeleteUser(user)"
+              [disabled]="!canEditOrDelete(user)"
+            >
+              DELETE
+            </button>
+          </ng-container>
+          <ng-container *ngIf="user.status === 'Inactive'">
+            <button
+              class="recover-button"
+              (click)="handleRecoverUser(user)"
+            >
+              RECOVER
+            </button>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add User Modal -->
+  <div *ngIf="showAddUserModal" class="modal-overlay" (click)="closeAddUserModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Add New User</h2>
+        <button class="close-button" (click)="closeAddUserModal()">×</button>
+      </div>
+
+      <form class="modal-form" (ngSubmit)="handleAddUser()">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            class="form-input"
+            [value]="newUserData.username"
+            (input)="onNewUserInputChange('username', $any($event.target).value)"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            class="form-input"
+            [value]="newUserData.password"
+            (input)="onNewUserInputChange('password', $any($event.target).value)"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role</label>
+          <select
+            id="role"
+            class="form-input"
+            [value]="newUserData.role"
+            (change)="onNewUserInputChange('role', $any($event.target).value)"
+          >
+            <option value="USER">USER</option>
+            <option value="MANAGER">MANAGER</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-button" (click)="closeAddUserModal()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="create-button"
+            [disabled]="isCreatingUser"
+          >
+            {{ isCreatingUser ? 'Creating...' : 'Create User' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div *ngIf="showEditUserModal && editingUser" class="modal-overlay" (click)="closeEditUserModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Edit User</h2>
+        <button class="close-button" (click)="closeEditUserModal()">×</button>
+      </div>
+
+      <form class="modal-form" (ngSubmit)="handleUpdateUser()">
+        <div class="form-group">
+          <label for="edit-username">Username</label>
+          <input
+            type="text"
+            id="edit-username"
+            class="form-input"
+            [value]="editUserData.username"
+            (input)="onEditUserInputChange('username', $any($event.target).value)"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-password">Password (leave blank to keep current)</label>
+          <input
+            type="password"
+            id="edit-password"
+            class="form-input"
+            [value]="editUserData.password"
+            (input)="onEditUserInputChange('password', $any($event.target).value)"
+            placeholder="Enter new password or leave blank"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-role">Role</label>
+          <select
+            id="edit-role"
+            class="form-input"
+            [value]="editUserData.role"
+            (change)="onEditUserInputChange('role', $any($event.target).value)"
+          >
+            <option value="USER">USER</option>
+            <option value="MANAGER">MANAGER</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-button" (click)="closeEditUserModal()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="update-button"
+            [disabled]="isUpdatingUser"
+          >
+            {{ isUpdatingUser ? 'Updating...' : 'Update User' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
