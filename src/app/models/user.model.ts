@@ -1,7 +1,7 @@
 export interface User {
   id: string;
   username: string;
-  email: string;
+  email: string;  
   role: 'ADMIN' | 'MANAGER' | 'USER';
   status: 'Active' | 'Inactive';
   company: string;

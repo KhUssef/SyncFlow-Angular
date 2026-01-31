@@ -1,4 +1,4 @@
-<app-side-bar (collapsedChange)="onSidebarCollapsed($event)"></app-side-bar>
+<app-side-bar *ngIf="isauthenticated()" (collapsedChange)="onSidebarCollapsed($event)" ></app-side-bar>
 <div class="main-content" [class.collapsed]="isSidebarCollapsed">
   <router-outlet></router-outlet>
 </div>

@@ -1,13 +1,13 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Output, EventEmitter, ChangeDetectionStrategy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from '../../services/auth.service';
 
 interface User {
   id: string;
   username: string;
-  email: string;
-  role: 'manager' | 'employee';
+  role: 'manager' | 'user';
   company: any;
 }
 
@@ -22,18 +22,13 @@ interface User {
 export class SideBarComponent implements OnInit, OnDestroy {
   collapsed = false;
   @Output() collapsedChange = new EventEmitter<boolean>();
-  
-  user: User | null = {
-    id: '1',
-    username: 'John Doe',
-    email: 'john@example.com',
-    role: 'manager',
-    company: { id: '1', code: 'ACME' }
-  };
-  isManager = true;
+  user: User | null = null;
+  isManager: boolean = false;
+  constructor(private authService: AuthService) {}
 
   ngOnInit() {
-    // Static data - no subscriptions needed
+    this.user = this.authService.getCurrentUser();
+    this.isManager = this.authService.getIsManager();
   }
 
   toggleSidebar() {
@@ -43,12 +38,9 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   handleLogout() {
     console.log('Logged out');
-    // Static logout - just reset user
-    this.user = null;
-    this.isManager = false;
+    this.authService.logout();
   }
 
   ngOnDestroy() {
-    // No cleanup needed
   }
 }
