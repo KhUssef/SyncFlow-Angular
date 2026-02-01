@@ -19,10 +19,10 @@
     </div>
 
     <div class="chatList">
-      <div *ngFor="let chat of chats" (click)="selectChat(chat)" [class.chatItemActive]="selectedChat?.id === chat.id" class="chatItem">
+      <div *ngFor="let chat of (chats$ | async)" (click)="selectChat(chat)" [class.chatItemActive]="selectedChat()?.id === chat.id" class="chatItem">
         <div class="chatItemContent">
           <div class="chatItemMain">
-            <h4 class="chatItemTitle" [class.chatItemTitleActive]="selectedChat?.id === chat.id">{{ chat.name }}</h4>
+            <h4 class="chatItemTitle" [class.chatItemTitleActive]="selectedChat()?.id === chat.id">{{ chat.name }}</h4>
             <p *ngIf="chat.lastMessage" class="chatItemLastMessage">{{ chat.lastMessage.senderUsername }}: {{ chat.lastMessage.content }}</p>
             <span class="chatItemCount">{{ chat.messageCount }} messages</span>
           </div>
@@ -32,9 +32,9 @@
     </div>
 
     <div class="connectedUsers">
-      <h4 class="connectedUsersTitle">Connected Users ({{ connectedUsers.length }})</h4>
+      <h4 class="connectedUsersTitle">Connected Users ({{ connectedUsers().length }})</h4>
       <div class="connectedUsersList">
-        <div *ngFor="let u of connectedUsers" class="connectedUser">
+        <div *ngFor="let u of connectedUsers()" class="connectedUser">
           <div class="onlineIndicator"></div>
           {{ u.username }}
         </div>
@@ -44,15 +44,15 @@
 
   <!-- Main Chat Area -->
   <div class="chatArea">
-    <ng-container *ngIf="selectedChat; else emptyState">
+    <ng-container *ngIf="selectedChat(); else emptyState">
       <div class="chatHeader">
-        <h2 class="chatHeaderTitle">{{ selectedChat?.name }}</h2>
+        <h2 class="chatHeaderTitle">{{ selectedChat()?.name }}</h2>
       </div>
 
       <div class="messagesContainer">
-        <div *ngFor="let message of messages" class="messageWrapper" [class.messageWrapperSent]="message.sender.id === user?.id" [class.messageWrapperReceived]="message.sender.id !== user?.id">
-          <div class="message" [class.messageSent]="message.sender.id === user?.id" [class.messageReceived]="message.sender.id !== user?.id">
-            <div *ngIf="message.sender.id !== user?.id" class="messageSender">{{ message.sender.username }}</div>
+        <div *ngFor="let message of messages()" class="messageWrapper" [class.messageWrapperSent]="message.sender.id === +(user?.id || '')" [class.messageWrapperReceived]="message.sender.id !== +(user?.id || '')">
+          <div class="message" [class.messageSent]="message.sender.id === +(user?.id || '')" [class.messageReceived]="message.sender.id !== +(user?.id || '')">
+            <div *ngIf="message.sender.id !== +(user?.id || '')" class="messageSender">{{ message.sender.username }}</div>
             <div class="messageContent">{{ message.content }}</div>
             <div class="messageTime">{{ message.createdAt | date:'shortTime' }}</div>
           </div>

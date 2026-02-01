@@ -1,7 +1,7 @@
 <div class="pageContainer">
   <div class="mainContainer">
     <!-- Main Tasks Card -->
-    <div class="card">
+    <div class="card" *ngIf="tasks$ | async as tasks">
       <div class="cardHeader">
         <h1 class="mainTitle">My Tasks</h1>
         <p class="welcomeText">Welcome, {{ username }}! Here are your assigned tasks.</p>
@@ -26,7 +26,7 @@
                 <input
                   type="checkbox"
                   [checked]="task.completed"
-                  (change)="toggleTaskCompletion(task.id)"
+                  (change)="toggleTaskCompletion(task)"
                   class="checkbox"
                   [attr.aria-label]="'Toggle completion for ' + task.title"
                 />
@@ -50,7 +50,6 @@
                   </p>
                   <div class="taskMeta">
                     <span>Due: {{ formatDate(task.dueDate) }}</span>
-                    <span *ngIf="task.company">Company: {{ task.company.name }}</span>
                   </div>
                 </div>
               </div>
@@ -74,19 +73,19 @@
         <!-- Total Tasks -->
         <div class="statItem statTotal">
           <h3 class="statLabel">Total Tasks</h3>
-          <p class="statValue">{{ tasks.length }}</p>
+          <p class="statValue">{{ (tasks$ | async)?.length || 0 }}</p>
         </div>
 
         <!-- Completed Tasks -->
         <div class="statItem statCompleted">
           <h3 class="statLabel">Completed</h3>
-          <p class="statValue">{{ completedTasksCount }}</p>
+          <p class="statValue">{{ (completedTasksCount$ | async) || 0 }}</p>
         </div>
 
         <!-- Pending Tasks -->
         <div class="statItem statPending">
           <h3 class="statLabel">Pending</h3>
-          <p class="statValue">{{ pendingTasksCount }}</p>
+          <p class="statValue">{{ (pendingTasksCount$ | async) || 0 }}</p>
         </div>
       </div>
     </div>

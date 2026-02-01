@@ -16,3 +16,13 @@ export interface CreateTaskInput {
   dueDate?: string;
   assignedToId?: string;
 }
+
+export interface UpdateTaskInput {
+  id: number;
+
+  title?: string;
+
+  description?: string;
+
+  dueDate?: Date;
+}

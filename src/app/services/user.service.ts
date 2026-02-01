@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { User, CreateUserInput, UpdateUserInput } from '../models/user.model';
 
@@ -6,6 +7,9 @@ import { User, CreateUserInput, UpdateUserInput } from '../models/user.model';
   providedIn: 'root'
 })
 export class UserService {
+  private http = inject(HttpClient);
+  private readonly baseUrl = 'http://localhost:3000/users';
+
   private staticUsers: User[] = [
     {
       id: '1',
@@ -79,6 +83,13 @@ export class UserService {
    */
   getActiveUsers(): Observable<User[]> {
     return this.users$;
+  }
+
+  /**
+   * Fetch usernames/id from backend
+   */
+  getUsernames(): Observable<Array<{id: number, username: string}>> {
+    return this.http.get<Array<{id: number, username: string}>>(`${this.baseUrl}/usernames`);
   }
 
   /**

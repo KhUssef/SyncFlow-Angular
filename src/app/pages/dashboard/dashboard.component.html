@@ -1,14 +1,14 @@
 <!-- dashboard.component.html -->
-<div class="dashboard-container" *ngIf="!loading && !error">
+<div class="dashboard-container" *ngIf="!loading() && !error()">
   <header class="dashboard-header">
     <h1>Workspace Management Dashboard</h1>
     <div style="display: flex; align-items: center; gap: 1rem;">
       <button
         (click)="openAddTaskModal()"
-        [disabled]="createTaskLoading"
+        [disabled]="createTaskLoading()"
         class="add-button"
       >
-        {{ createTaskLoading ? 'Creating...' : '+ Add Task' }}
+        {{ createTaskLoading() ? 'Creating...' : '+ Add Task' }}
       </button>
       <div class="current-date">
         {{ currentDate | date:'EEEE, MMMM d, y' }}
@@ -23,19 +23,19 @@
   <div class="stats-container">
     <div class="stat-card">
       <h3>Total Tasks</h3>
-      <p class="stat-number">{{ stats.totalTasks }}</p>
+      <p class="stat-number">{{ stats().totalTasks }}</p>
     </div>
     <div class="stat-card">
       <h3>Completed</h3>
-      <p class="stat-number">{{ stats.completedTasks }}</p>
+      <p class="stat-number">{{ stats().completedTasks }}</p>
     </div>
     <div class="stat-card">
       <h3>Pending</h3>
-      <p class="stat-number">{{ stats.pendingTasks }}</p>
+      <p class="stat-number">{{ stats().pendingTasks }}</p>
     </div>
     <div class="stat-card">
       <h3>Completion Rate</h3>
-      <p class="stat-number">{{ stats.completionRate }}%</p>
+      <p class="stat-number">{{ stats().completionRate }}%</p>
     </div>
   </div>
 
@@ -64,9 +64,9 @@
   <!-- Today's Tasks and Events -->
   <div class="today-section">
     <h2>Today's Tasks</h2>
-    <ul *ngIf="todayTasks.length > 0; else noTasks">
+    <ul *ngIf="todayTasks().length > 0; else noTasks">
       <li
-        *ngFor="let task of todayTasks"
+        *ngFor="let task of todayTasks()"
         [ngClass]="{
           'assigned-to-me': isTaskAssignedToMe(task),
           'not-assigned-to-me': !isTaskAssignedToMe(task)
@@ -91,9 +91,9 @@
     </ng-template>
 
     <h2 style="margin-top: 2rem;">Today's Events</h2>
-    <ul *ngIf="todayEvents.length > 0; else noEvents">
+    <ul *ngIf="todayEvents().length > 0; else noEvents">
       <li
-        *ngFor="let event of todayEvents"
+        *ngFor="let event of todayEvents()"
         [ngClass]="{
           'assigned-to-me': isEventCreatedByMe(event),
           'not-assigned-to-me': !isEventCreatedByMe(event)
@@ -117,20 +117,20 @@
 </div>
 
 <!-- Loading State -->
-<div class="loading" *ngIf="loading">
+<div class="loading" *ngIf="loading()">
   Loading dashboard data...
 </div>
 
 <!-- Error State -->
-<div class="error" *ngIf="error">
-  {{ error }}
+<div class="error" *ngIf="error()">
+  {{ error() }}
 </div>
 
 <!-- Add Task Modal -->
 <app-add-task-modal
-  *ngIf="isAddTaskModalOpen"
-  [users]="users"
-  [loading]="usersLoading"
+  *ngIf="isAddTaskModalOpen()"
+  [users]="users()"
+  [loading]="usersLoading()"
   (close)="closeAddTaskModal()"
   (submit)="handleCreateTask($event)"
 >

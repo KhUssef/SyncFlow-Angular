@@ -15,28 +15,31 @@ interface User {
   company: Company;
 }
 interface tokens {
-  accessToken: string;
-  refreshToken: string;
+  access_token: string;
+  refresh_token: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private userSubject = new BehaviorSubject<User |null>(null);
-  private http = inject(HttpClient);
-  public user$ = this.userSubject.asObservable();
+  private readonly userSubject = new BehaviorSubject<User | null>(null);
+  private readonly http = inject(HttpClient);
+  readonly user$ = this.userSubject.asObservable();
 
-  private isManagerSubject = new BehaviorSubject<boolean>(false);
-  public isManager$ = this.isManagerSubject.asObservable();
+  private readonly isManagerSubject = new BehaviorSubject<boolean>(false);
+  readonly isManager$ = this.isManagerSubject.asObservable();
   
-  private errorSubject = new BehaviorSubject<string | null>(null);
-  public error$ = this.errorSubject.asObservable();
+  private readonly errorSubject = new BehaviorSubject<string | null>(null);
+  readonly error$ = this.errorSubject.asObservable();
   
-  private loggedIn = signal(false);
-  private router = inject(Router);
+  private readonly loggedIn = signal(false);
+  private readonly router = inject(Router);
 
-  constructor() {}
+  constructor() {
+    // Hydrate auth state when the app bootstraps
+    this.checkauthstatus();
+  }
 
   getCurrentUser(): User | null {
     return this.userSubject.value;
@@ -44,6 +47,10 @@ export class AuthService {
 
   getIsManager(): boolean {
     return this.isManagerSubject.value;
+  }
+
+  getUserSnapshot(): User | null {
+    return this.userSubject.value;
   }
 
   login(username: string, password: string, companyCode: string): Observable<boolean> {
@@ -55,10 +62,10 @@ export class AuthService {
     }).pipe(
       map((response:tokens) => {
         console.log('Login successful, tokens received');
-        localStorage.setItem('accessToken', response.accessToken);
-        localStorage.setItem('refreshToken', response.refreshToken);
+        localStorage.setItem('accessToken', response.access_token);
+        localStorage.setItem('refreshToken', response.refresh_token);
         
-        this.getUserInfo();
+        this.refreshUser().subscribe();
         
         this.router.navigate(['/dashboard']);
         this.loggedIn.set(true);
@@ -73,11 +80,27 @@ export class AuthService {
       })
     );
   }
-  private getUserInfo(): void {
-    this.http.get<User>('/api/current-user').subscribe((user: User) => {
-      this.userSubject.next(user);
-      this.isManagerSubject.next(user.role === 'manager');
-    });
+  private refreshUser(): Observable<User | null> {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      this.userSubject.next(null);
+      this.isManagerSubject.next(false);
+      this.loggedIn.set(false);
+      return of(null);
+    }
+
+    return this.http.get<User>('http://localhost:3000/users/current').pipe(
+      tap((user) => {
+        this.userSubject.next(user);
+        this.isManagerSubject.next(user.role === 'manager');
+        this.loggedIn.set(true);
+      }),
+      catchError((err) => {
+        console.error('Failed to refresh user', err);
+        this.logout();
+        return of(null);
+      })
+    );
   }
   logout(): void {
     localStorage.removeItem('accessToken');
@@ -103,9 +126,10 @@ export class AuthService {
       refreshToken
     }).pipe(
       map((response: tokens) => {
-        localStorage.setItem('accessToken', response.accessToken);
-        localStorage.setItem('refreshToken', response.refreshToken);
+        localStorage.setItem('accessToken', response.access_token);
+        localStorage.setItem('refreshToken', response.refresh_token);
         this.updateAuthStatus(true);
+        this.refreshUser().subscribe();
         return true;
       }),
       catchError(() => {
@@ -129,7 +153,7 @@ export class AuthService {
     if(token){
       this.loggedIn.set(true);
       this.isManagerSubject.next(this.getCurrentUser()?.role === 'manager' || false);
-      this.getUserInfo();
+      this.refreshUser().subscribe();
     } else {
       this.loggedIn.set(false);
       this.isManagerSubject.next(false);

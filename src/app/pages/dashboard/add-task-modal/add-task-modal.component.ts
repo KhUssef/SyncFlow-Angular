@@ -12,7 +12,7 @@ import { User } from '../../../models/user.model';
   styleUrls: ['./add-task-modal.component.css']
 })
 export class AddTaskModalComponent {
-  @Input() users: User[] = [];
+  @Input() users: {id:number, username:string}[] = [];
   @Input() loading = false;
   @Output() close = new EventEmitter<void>();
   @Output() submit = new EventEmitter<any>();
@@ -48,7 +48,7 @@ export class AddTaskModalComponent {
     this.taskForm.reset();
   }
 
-  get uniqueUsers(): User[] {
+  get uniqueUsers(): {id:number, username:string}[] {
     const seen = new Set();
     return this.users.filter(user => {
       const duplicate = seen.has(user.id);
