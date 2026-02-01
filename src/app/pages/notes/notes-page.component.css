@@ -7,6 +7,131 @@
   min-height: 100vh;
 }
 
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2.4vh;
+  align-items: start;
+}
+
+.sidebar {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.6vh;
+  padding: 2.4vh;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  min-height: 50vh;
+}
+
+.sidebarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.6vh;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 1.2vh;
+  letter-spacing: 0.24vh;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+.sidebar h3 {
+  margin: 0;
+  font-size: 2.2vh;
+}
+
+.createRow {
+  display: flex;
+  gap: 1vh;
+  margin: 1.2vh 0 2vh;
+}
+
+.createRow input {
+  flex: 1;
+  padding: 0.9vh 1.2vh;
+  border-radius: 1vh;
+  border: 1px solid #e5e7eb;
+  font-size: 1.4vh;
+}
+
+.createRow button {
+  padding: 0.9vh 1.6vh;
+  border-radius: 1vh;
+  border: none;
+  background: #111827;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.4vh;
+  transition: all 0.2s ease;
+}
+
+.createRow button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.noteList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8vh;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.noteListItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2vh 1.4vh;
+  border: 1px solid transparent;
+  border-radius: 1.2vh;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.noteListItem:hover {
+  border-color: #e5e7eb;
+  background: #f9fafb;
+}
+
+.noteListItem.selected {
+  border-color: #111827;
+  background: #111827;
+  color: #fff;
+}
+
+.noteMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2vh;
+}
+
+.noteTitle {
+  font-weight: 600;
+  font-size: 1.5vh;
+}
+
+.noteSubtitle {
+  font-size: 1.2vh;
+  color: #9ca3af;
+}
+
+.noteListItem.selected .noteSubtitle {
+  color: #d1d5db;
+}
+
+.chevron {
+  font-size: 1.6vh;
+}
+
+.muted {
+  color: #9ca3af;
+  font-size: 1.3vh;
+}
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -16,6 +141,14 @@
   border-bottom: 0.1vh solid #e0e0e0;
   flex-wrap: wrap;
   gap: 1.6vh;
+}
+
+.workspace {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.6vh;
+  padding: 2.8vh;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
 }
 
 .header h2 {
@@ -326,6 +459,14 @@
 @media (max-width: 768px) {
   .container {
     padding: 1.6vh;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: relative;
   }
   
   .header {
