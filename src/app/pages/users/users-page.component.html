@@ -7,7 +7,7 @@
     </div>
     <div class="header-actions">
       <button 
-        *ngIf="isManager && !showDeleted"
+        *ngIf="isManager && !showDeleted()"
         class="add-button"
         (click)="openAddUserModal()"
       >
@@ -23,7 +23,7 @@
         type="text"
         placeholder="Search users..."
         class="search-input"
-        [value]="searchTerm"
+        [value]="searchTerm()"
         (input)="onSearchChange($any($event.target).value)"
       />
     </div>
@@ -31,7 +31,7 @@
     <div class="filter-container">
       <select
         class="role-filter"
-        [value]="selectedRole"
+        [value]="selectedRole()"
         (change)="onRoleChange($any($event.target).value)"
       >
         <option value="">All Roles</option>
@@ -44,7 +44,7 @@
         <input
           type="checkbox"
           class="toggle-input"
-          [checked]="showDeleted"
+          [checked]="showDeleted()"
           (change)="onShowDeletedChange($any($event.target).checked)"
         />
         <span class="toggle-slider"></span>
@@ -55,14 +55,14 @@
 
   <!-- Users Grid -->
   <div class="users-grid">
-    <div *ngIf="filteredUsers.length === 0" class="no-results">
-      No {{ showDeleted ? 'deleted' : 'active' }} users found
+    <div *ngIf="filteredUsers().length === 0" class="no-results">
+      No {{ showDeleted() ? 'deleted' : 'active' }} users found
     </div>
 
-    <div *ngFor="let user of filteredUsers" class="user-card">
+    <div *ngFor="let user of filteredUsers()" class="user-card">
       <div class="card-header">
         <h2 class="user-name">{{ user.username }}</h2>
-        <span class="status-badge" [ngClass]="user.status.toLowerCase()">
+        <span class="status-badge" [ngClass]="user.status?.toLowerCase() || ''">
           {{ user.status }}
         </span>
       </div>
@@ -79,11 +79,11 @@
               {{ user.role }}
             </span>
           </div>
-          <div class="info-item">
+          <!-- <div class="info-item">
             <span class="info-label">COMPANY</span>
             <span class="info-value">{{ user.company }}</span>
-          </div>
-          <div *ngIf="showDeleted && user.deletedAt" class="info-item">
+          </div> -->
+          <div *ngIf="showDeleted() && user.deletedAt" class="info-item">
             <span class="info-label">DELETED AT</span>
             <span class="info-value">{{ user.deletedAt | date: 'shortDate' }}</span>
           </div>
@@ -92,7 +92,7 @@
 
       <div class="card-footer">
         <ng-container *ngIf="isManager">
-          <ng-container *ngIf="user.status === 'Active'">
+          <ng-container>
             <button
               class="edit-button"
               (click)="openEditUserModal(user)"
@@ -104,11 +104,12 @@
               class="delete-button"
               (click)="handleDeleteUser(user)"
               [disabled]="!canEditOrDelete(user)"
+               *ngIf="user.deletedAt === null"
             >
               DELETE
             </button>
           </ng-container>
-          <ng-container *ngIf="user.status === 'Inactive'">
+          <ng-container *ngIf="user.deletedAt !== null">
             <button
               class="recover-button"
               (click)="handleRecoverUser(user)"
@@ -164,7 +165,6 @@
           >
             <option value="USER">USER</option>
             <option value="MANAGER">MANAGER</option>
-            <option value="ADMIN">ADMIN</option>
           </select>
         </div>
 
@@ -227,7 +227,6 @@
           >
             <option value="USER">USER</option>
             <option value="MANAGER">MANAGER</option>
-            <option value="ADMIN">ADMIN</option>
           </select>
         </div>
 

@@ -1,21 +1,21 @@
 export interface User {
-  id: string;
+  id: number | string;
   username: string;
-  email: string;  
-  role: 'ADMIN' | 'MANAGER' | 'USER';
-  status: 'Active' | 'Inactive';
-  company: string;
+  email?: string;
+  role: 'manager' | 'user'
+  status?: 'Active' | 'Inactive';
+  company?: { id: string | number; code: string } | string;
   deletedAt?: string;
 }
 
 export interface CreateUserInput {
   username: string;
   password: string;
-  role: 'ADMIN' | 'MANAGER' | 'USER';
+  role: 'manager' | 'user'
 }
 
 export interface UpdateUserInput {
   username: string;
   password?: string;
-  role: 'ADMIN' | 'MANAGER' | 'USER';
+  role: 'manager' | 'user'
 }

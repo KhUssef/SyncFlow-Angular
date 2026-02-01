@@ -8,7 +8,7 @@
         </a>
       </li>
 
-      <li *ngIf="isManager" class="nav-item">
+      <li *ngIf="isManager()" class="nav-item">
         <a routerLink="/users" routerLinkActive="active" class="nav-link">
           <mat-icon class="icon">people</mat-icon>
           <span *ngIf="!collapsed" class="text">Members</span>

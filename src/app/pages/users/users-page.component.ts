@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,15 +17,24 @@ import { takeUntil } from 'rxjs/operators';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UsersPageComponent implements OnInit, OnDestroy {
-  users: User[] = [];
-  deletedUsers: User[] = [];
-  filteredUsers: User[] = [];
+  users = signal<User[]>([]);
+  deletedUsers = signal<User[]>([]);
+  searchTerm = signal('');
+  selectedRole = signal('');
+  showDeleted = signal(false);
+
+  filteredUsers = computed(() => {
+    const data = this.showDeleted() ? this.deletedUsers() : this.users();
+    const term = this.searchTerm().toLowerCase();
+    const role = this.selectedRole();
+    return data.filter((user) => {
+      const matchesSearch = user.username.toLowerCase().includes(term) || (user.email || '').toLowerCase().includes(term);
+      const matchesRole = !role || user.role === role;
+      return matchesSearch && matchesRole;
+    });
+  });
   
-  searchTerm = '';
-  selectedRole = '';
-  showDeleted = false;
-  
-  isManager = true; // Static - set to true for demo
+  isManager = true; // TODO: wire to auth if needed
   
   // Modal states
   showAddUserModal = false;
@@ -36,13 +45,13 @@ export class UsersPageComponent implements OnInit, OnDestroy {
   newUserData: CreateUserInput = {
     username: '',
     password: '',
-    role: 'USER'
+    role: 'user' 
   };
   
   editUserData: UpdateUserInput = {
     username: '',
     password: '',
-    role: 'USER'
+    role: 'user' 
   };
   
   isCreatingUser = false;
@@ -58,46 +67,33 @@ export class UsersPageComponent implements OnInit, OnDestroy {
   }
 
   loadUsers(): void {
-    this.userService.getActiveUsers()
+    this.userService.getCompanyUsers()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(users => {
-        this.users = users;
-        this.roles = this.userService.getUniqueRoles(users);
-        this.applyFilters();
+      .subscribe((users) => {
+        this.users.set(users);
+        console.log('Loaded users:', users);
+        this.roles = [...new Set(users.map((u) => u.role))] as string[];
       });
 
     this.userService.getDeletedUsers()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(users => {
-        this.deletedUsers = users;
-        this.applyFilters();
+      .subscribe((users) => {
+        this.deletedUsers.set(users);
       });
   }
 
-  applyFilters(): void {
-    const dataToFilter = this.showDeleted ? this.deletedUsers : this.users;
-    this.filteredUsers = this.userService.filterUsers(
-      dataToFilter,
-      this.searchTerm,
-      this.selectedRole
-    );
-  }
-
   onSearchChange(value: string): void {
-    this.searchTerm = value;
-    this.applyFilters();
+    this.searchTerm.set(value);
   }
 
   onRoleChange(role: string): void {
-    this.selectedRole = role;
-    this.applyFilters();
+    this.selectedRole.set(role);
   }
 
   onShowDeletedChange(checked: boolean): void {
-    this.showDeleted = checked;
-    this.selectedRole = '';
-    this.searchTerm = '';
-    this.applyFilters();
+    this.showDeleted.set(checked);
+    this.selectedRole.set('');
+    this.searchTerm.set('');
   }
 
   openAddUserModal(): void {
@@ -105,7 +101,7 @@ export class UsersPageComponent implements OnInit, OnDestroy {
     this.newUserData = {
       username: '',
       password: '',
-      role: 'USER'
+      role: 'user' 
     };
   }
 
@@ -118,7 +114,7 @@ export class UsersPageComponent implements OnInit, OnDestroy {
     this.editUserData = {
       username: user.username,
       password: '',
-      role: user.role
+      role: user.role || 'user' 
     };
     this.showEditUserModal = true;
   }
@@ -151,6 +147,7 @@ export class UsersPageComponent implements OnInit, OnDestroy {
           alert('User created successfully!');
           this.closeAddUserModal();
           this.isCreatingUser = false;
+          this.loadUsers();
         },
         error: (err) => {
           alert('Error creating user: ' + err.message);
@@ -167,13 +164,14 @@ export class UsersPageComponent implements OnInit, OnDestroy {
 
     this.isUpdatingUser = true;
 
-    this.userService.updateUser(this.editingUser.id, this.editUserData)
+    this.userService.updateUser(+this.editingUser.id, this.editUserData)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           alert('User updated successfully!');
           this.closeEditUserModal();
           this.isUpdatingUser = false;
+          this.loadUsers();
         },
         error: (err) => {
           alert('Error updating user: ' + err.message);
@@ -187,11 +185,12 @@ export class UsersPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.userService.deleteUser(user.id)
+    this.userService.deleteUser(+user.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           alert('User deleted successfully');
+          this.loadUsers();
         },
         error: (err) => {
           alert('Error deleting user: ' + err.message);
@@ -200,11 +199,12 @@ export class UsersPageComponent implements OnInit, OnDestroy {
   }
 
   handleRecoverUser(user: User): void {
-    this.userService.recoverUser(user.id)
+    this.userService.recoverUser(+user.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           alert('User recovered successfully');
+          this.loadUsers();
         },
         error: (err) => {
           alert('Error recovering user: ' + err.message);

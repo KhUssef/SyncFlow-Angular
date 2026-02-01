@@ -11,7 +11,7 @@ interface Company {
 interface User {
   id: string;
   username: string;
-  role: 'manager' | 'user';
+  role: 'manager' | 'user'
   company: Company;
 }
 interface tokens {
