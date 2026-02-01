@@ -67,7 +67,7 @@
               min="8"
               max="72"
               [value]="getSelectedLineData()?.fontSize || 14"
-              (change)="handleStyleChange('fontSize', $event)"
+              (change)="handleStyleChange('fontSize', $any($event.target).value)"
               class="menuInput"
               [disabled]="!getSelectedLineData()"
               style="width: 70px"
@@ -79,7 +79,7 @@
             <input
               type="color"
               [value]="getSelectedLineData()?.color || '#000000'"
-              (change)="handleStyleChange('color', $event)"
+              (change)="handleStyleChange('color', $any($event.target).value)"
               class="colorInput"
               [disabled]="!getSelectedLineData()"
             />

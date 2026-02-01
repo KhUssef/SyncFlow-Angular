@@ -229,6 +229,7 @@ export class NotesPageComponent implements OnInit, OnDestroy {
     if (this.currentLock && this.currentLock.lineNumber === lineNumber) return;
     console.log(`Requesting lock for line ${lineNumber}`);
     this.selectedLine.set(lineNumber);
+    this.refreshLinesIfTail(lineNumber);
     this.socket?.emit('softlock', { lineNumber }, (response: { success: boolean; lockedBy?: string }) => {
       if (response.success) {
         this.currentLock = { noteNumber: this.selectedNoteId()!, lineNumber };
@@ -285,9 +286,13 @@ export class NotesPageComponent implements OnInit, OnDestroy {
     const selected = this.selectedLine();
     if (!selected) return;
 
+    const normalizedValue = styleProperty === 'fontSize'
+      ? Number(value) || 14
+      : value;
+
     this.noteLines.update((lines) => lines.map((line) =>
       line.lineNumber === selected
-        ? { ...line, [styleProperty]: value }
+        ? { ...line, [styleProperty]: normalizedValue }
         : line
     ));
 
@@ -313,6 +318,18 @@ export class NotesPageComponent implements OnInit, OnDestroy {
     };
 
     this.socket.emit('alterNote', payload);
+  }
+
+  private refreshLinesIfTail(lineNumber: number) {
+    const noteId = this.selectedNoteId();
+    if (!noteId) return;
+    const lines = this.noteLines();
+    if (!lines.length) return;
+    const maxLine = Math.max(...lines.map((l) => l.lineNumber));
+    const isInLastTen = lineNumber >= maxLine - 9;
+    if (isInLastTen && !this.linesLoading()) {
+      this.loadLines(noteId);
+    }
   }
 
   private scheduleAlterNote(lineNumber: number) {
