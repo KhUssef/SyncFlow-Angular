@@ -1,0 +1,539 @@
+/* notes.module.css (updated to increase textarea width) */
+
+.container {
+  padding: 3.2vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  background: #fafafa;
+  min-height: 100vh;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2.4vh;
+  align-items: start;
+}
+
+.sidebar {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.6vh;
+  padding: 2.4vh;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  min-height: 50vh;
+}
+
+.sidebarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.6vh;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 1.2vh;
+  letter-spacing: 0.24vh;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+.sidebar h3 {
+  margin: 0;
+  font-size: 2.2vh;
+}
+
+.createRow {
+  display: flex;
+  gap: 1vh;
+  margin: 1.2vh 0 2vh;
+}
+
+.createRow input {
+  flex: 1;
+  padding: 0.9vh 1.2vh;
+  border-radius: 1vh;
+  border: 1px solid #e5e7eb;
+  font-size: 1.4vh;
+}
+
+.createRow button {
+  padding: 0.9vh 1.6vh;
+  border-radius: 1vh;
+  border: none;
+  background: #111827;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.4vh;
+  transition: all 0.2s ease;
+}
+
+.createRow button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.noteList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8vh;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.noteListItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2vh 1.4vh;
+  border: 1px solid transparent;
+  border-radius: 1.2vh;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.noteListItem:hover {
+  border-color: #e5e7eb;
+  background: #f9fafb;
+}
+
+.noteListItem.selected {
+  border-color: #111827;
+  background: #111827;
+  color: #fff;
+}
+
+.noteMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2vh;
+}
+
+.noteTitle {
+  font-weight: 600;
+  font-size: 1.5vh;
+}
+
+.noteSubtitle {
+  font-size: 1.2vh;
+  color: #9ca3af;
+}
+
+.noteListItem.selected .noteSubtitle {
+  color: #d1d5db;
+}
+
+.chevron {
+  font-size: 1.6vh;
+}
+
+.muted {
+  color: #9ca3af;
+  font-size: 1.3vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3.2vh;
+  padding: 2.4vh 0;
+  border-bottom: 0.1vh solid #e0e0e0;
+  flex-wrap: wrap;
+  gap: 1.6vh;
+}
+
+.workspace {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.6vh;
+  padding: 2.8vh;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.connectionStatus {
+  padding: 0.6vh 1.6vh;
+  border-radius: 2vh;
+  font-size: 1.1vh;
+  font-weight: 500;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.1vh;
+  display: flex;
+  align-items: center;
+  gap: 0.8vh;
+  transition: all 0.4s ease;
+}
+
+.connectionStatus.connected {
+  background: #10b981;
+}
+
+.connectionStatus.disconnected {
+  background: #ef4444;
+}
+
+.connectionStatus::before {
+  content: '';
+  width: 0.6vh;
+  height: 0.6vh;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.styleMenu {
+  display: flex;
+  align-items: center;
+  gap: 3.2vh;
+  padding: 2vh 2.4vh;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(1vh);
+  border-radius: 2vh;
+  transition: all 0.4s ease;
+  flex-grow: 1;
+}
+
+.styleMenu.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.menuLabel {
+  font-size: 1.5vh;
+  font-weight: 400;
+  color: #666;
+  min-width: 14vh;
+  letter-spacing: -0.02vh;
+}
+
+.menuControl {
+  display: flex;
+  align-items: center;
+  gap: 0.8vh;
+}
+
+.menuControl label {
+  font-size: 1.1vh;
+  font-weight: 500;
+  color: #888;
+  min-width: 4vh;
+  text-transform: uppercase;
+  letter-spacing: 0.1vh;
+}
+
+.menuInput {
+  padding: 0.8vh 1.2vh;
+  font-size: 1.4vh;
+  border: none;
+  border-radius: 1.2vh;
+  background: rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  font-weight: 400;
+}
+
+.menuInput:focus {
+  outline: none;
+  background: rgba(0, 0, 0, 0.08);
+  transform: scale(1.02);
+}
+
+.colorInput {
+  width: 3.6vh;
+  height: 3.6vh;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.colorInput:hover {
+  transform: scale(1.1);
+}
+
+.colorInput:focus {
+  outline: none;
+  transform: scale(1.1);
+}
+
+.highlightToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.8vh;
+  padding: 0.8vh 1.6vh;
+  border: none;
+  border-radius: 1.6vh;
+  background: rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.1vh;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1vh;
+  color: #666;
+}
+
+.highlightToggle:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: scale(1.02);
+}
+
+.highlightToggle.active {
+  background: rgba(255, 193, 7, 0.2);
+  color: #f57f17;
+}
+
+.checkbox {
+  width: 1.6vh;
+  height: 1.6vh;
+  accent-color: black;
+}
+
+.error {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  padding: 1.6vh 2.4vh;
+  border-radius: 1.6vh;
+  margin-bottom: 2.4vh;
+  font-weight: 400;
+}
+
+.noteLines {
+  background: transparent;
+}
+
+.noteLine {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.8vh 0;
+  transition: all 0.4s ease;
+  position: relative;
+  cursor: pointer;
+  border-radius: 1.2vh;
+  margin-bottom: 0.2vh;
+}
+
+.noteLine:hover {
+  background: rgba(0, 0, 0, 0.02);
+  transform: translateX(0.4vh);
+}
+
+.noteLine.selected {
+  background: rgba(16, 185, 129, 0.08);
+  transform: translateX(0.8vh);
+}
+
+.lockedLine {
+  background: rgba(239, 68, 68, 0.08);
+  transform: translateX(0.8vh);
+}
+
+.highlighted {
+  background: rgba(255, 193, 7, 0.15);
+}
+
+.lineNumber {
+  width: 4.8vh;
+  text-align: center;
+  margin-right: 2vh;
+  color: #bbb;
+  font-size: 1.1vh;
+  font-weight: 500;
+  padding: 0.4vh 0;
+  background: transparent;
+  border-radius: 1.2vh;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.noteLine:hover .lineNumber {
+  color: #888;
+}
+
+.lineContent {
+  flex: 1;
+}
+
+.textarea {
+  width: 100%;
+  max-width: 140vh; /* Increased from 100vh to make textarea wider */
+  min-height: 2.8vh;
+  padding: 0.6vh 1.2vh;
+  border: none;
+  border-radius: 1vh;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 1.5vh;
+  line-height: 1.4;
+  background: transparent;
+  transition: all 0.3s ease;
+  font-weight: 300;
+}
+
+.textarea:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(0.8vh);
+  transform: scale(1.01);
+}
+
+.textarea:disabled {
+  background: transparent;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.textarea::placeholder {
+  color: #ccc;
+  font-style: italic;
+  font-weight: 300;
+}
+
+.lockIndicator {
+  font-size: 1vh;
+  color: #999;
+  font-style: italic;
+  margin-top: 0.8vh;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  gap: 0.6vh;
+}
+
+.lockIndicator::before {
+  content: '✦';
+  font-size: 0.8vh;
+}
+
+.tips {
+  margin-top: 4.8vh;
+  padding: 2.4vh 0;
+  font-size: 1.3vh;
+  color: #666;
+  background: transparent;
+}
+
+.tips p {
+  margin: 0 0 1.6vh 0;
+  font-weight: 400;
+  font-size: 1.5vh;
+  color: #888;
+}
+
+.tips ul {
+  padding-left: 2vh;
+  margin: 0;
+  line-height: 1.8;
+}
+
+.tips li {
+  margin-bottom: 0.8vh;
+  position: relative;
+  font-weight: 300;
+  color: #999;
+}
+
+.tips li::marker {
+  content: '·';
+  color: #ccc;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1.6vh;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: relative;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.6vh 0;
+    gap: 1.6vh;
+  }
+
+  .connectionStatus {
+    margin-left: 0;
+    font-size: 1.2vh;
+    padding: 0.6vh 1.2vh;
+  }
+  
+  .styleMenu {
+    flex-direction: column;
+    gap: 1.6vh;
+    align-items: flex-start;
+    width: 100%;
+  }
+  
+  .menuControl {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .noteLine {
+    flex-direction: column;
+    gap: 1.2vh;
+  }
+  
+  .lineNumber {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 0.8vh;
+  }
+}
+
+/* Light Mode - Default */
+.container {
+  background: #fafafa;
+}
+
+.header {
+  background: #fff;
+  border-bottom: 0.1vh solid #e0e0e0;
+}
+
+.styleMenu {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.noteLines {
+  background: transparent;
+}
+
+.textarea {
+  color: #333;
+}
+
+.menuInput {
+  background: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+.highlightToggle {
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+}
