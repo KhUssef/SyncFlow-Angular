@@ -20,6 +20,7 @@
   border-radius: 1.6vh;
   padding: 2.4vh;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  border: 2px solid black;
   min-height: 50vh;
 }
 
@@ -149,6 +150,7 @@
   border-radius: 1.6vh;
   padding: 2.8vh;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  border: 2px solid black;
 }
 
 .header h2 {
