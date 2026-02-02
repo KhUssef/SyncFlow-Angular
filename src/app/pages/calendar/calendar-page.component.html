@@ -6,7 +6,7 @@
       <p>Manage and view your events</p>
     </div>
     <div class="current-date">
-      {{ (currentDate | date: 'EEEE, MMMM d, yyyy') }}
+      {{ (currentDate() | date: 'EEEE, MMMM d, yyyy') }}
     </div>
   </header>
 
@@ -25,7 +25,7 @@
       <div class="calendar-controls">
         <button class="nav-button" (click)="previousMonth()">← Previous</button>
         <div class="month-year">
-          <h3>{{ currentMonth }} {{ currentYear }}</h3>
+          <h3>{{ currentMonth() }} {{ currentYear() }}</h3>
           <button class="today-button" (click)="today()">Today</button>
         </div>
         <button class="nav-button" (click)="nextMonth()">Next →</button>
@@ -69,11 +69,11 @@
       </div>
 
       <div class="events-list">
-        <div *ngIf="currentMonthEvents.length === 0" class="no-events">
-          No events in {{ currentMonth }}
+        <div *ngIf="currentMonthEvents().length === 0" class="no-events">
+          No events in {{ currentMonth() }}
         </div>
 
-        <div *ngFor="let event of currentMonthEvents" 
+        <div *ngFor="let event of currentMonthEvents()" 
              class="event-card"
              (click)="openEventDetails(event)">
           <div class="event-date">
@@ -84,7 +84,7 @@
           </div>
           <h3 class="event-title">{{ event.title }}</h3>
           <div class="event-assigned">
-            👤 {{ event.createdBy }}
+            👤 {{ event.createdBy.username || 'Unknown user' }}
           </div>
         </div>
       </div>
@@ -92,35 +92,35 @@
   </div>
 
   <!-- Event Details Modal -->
-  <div *ngIf="showEventDetails && selectedEvent" class="event-details-overlay" (click)="closeEventDetails()">
+  <div *ngIf="showEventDetails() && selectedEvent()" class="event-details-overlay" (click)="closeEventDetails()">
     <div class="event-details-card" (click)="$event.stopPropagation()">
       <button class="close-button" (click)="closeEventDetails()">×</button>
       
-      <h2 class="details-title">{{ selectedEvent.title }}</h2>
+      <h2 class="details-title">{{ selectedEvent()?.title }}</h2>
       
       <div class="details-section">
         <label class="details-label">DATE & TIME:</label>
         <div class="details-content">
-          {{ formatFullDateTime(selectedEvent.date) }}
+          {{ formatFullDateTime(selectedEvent()?.date || "") }}
         </div>
       </div>
 
       <div class="details-section">
         <label class="details-label">CREATED BY:</label>
         <div class="details-content">
-          {{ selectedEvent.createdBy }}
+          {{ selectedEvent()?.createdBy?.username || 'Unknown user' }}
         </div>
       </div>
 
-      <div *ngIf="selectedEvent.description" class="details-section">
+      <div *ngIf="selectedEvent()?.description" class="details-section">
         <label class="details-label">DESCRIPTION:</label>
         <div class="details-content">
-          {{ selectedEvent.description }}
+          {{ selectedEvent()?.description }}
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="delete-button" (click)="handleDeleteEvent(selectedEvent)">
+        <button class="delete-button" (click)="handleDeleteEvent(selectedEvent())">
           DELETE
         </button>
         <button class="close-modal-button" (click)="closeEventDetails()">
@@ -131,20 +131,19 @@
   </div>
 
   <!-- Create Event Modal -->
-  <div *ngIf="showEventModal" class="event-details-overlay" (click)="closeAddEventModal()">
+  <div *ngIf="showEventModal()" class="event-details-overlay" (click)="closeAddEventModal()">
     <div class="event-details-card" (click)="$event.stopPropagation()">
       <button class="close-button" (click)="closeAddEventModal()">×</button>
       
       <h2 class="details-title">Create New Event</h2>
 
-      <form (ngSubmit)="handleCreateEvent()">
+      <form [formGroup]="eventForm" (ngSubmit)="handleCreateEvent()">
         <div class="details-section">
           <label class="details-label">Title *</label>
           <input
             type="text"
             class="input-field"
-            [value]="newEventData.title"
-            (input)="onEventInputChange('title', $any($event.target).value)"
+            formControlName="title"
             placeholder="Enter event title"
             required
           />
@@ -155,8 +154,7 @@
           <input
             type="datetime-local"
             class="input-field"
-            [value]="newEventData.date"
-            (input)="onEventInputChange('date', $any($event.target).value)"
+            formControlName="date"
           />
         </div>
 
@@ -164,8 +162,7 @@
           <label class="details-label">Description</label>
           <textarea
             class="textarea-field"
-            [value]="newEventData.description"
-            (input)="onEventInputChange('description', $any($event.target).value)"
+            formControlName="description"
             placeholder="Enter event description (optional)"
             rows="4"
           ></textarea>
@@ -178,9 +175,9 @@
           <button 
             type="submit" 
             class="save-button"
-            [disabled]="isCreatingEvent || !newEventData.title.trim()"
+            [disabled]="isCreatingEvent() || eventForm.invalid"
           >
-            {{ isCreatingEvent ? 'CREATING...' : 'CREATE EVENT' }}
+            {{ isCreatingEvent() ? 'CREATING...' : 'CREATE EVENT' }}
           </button>
         </div>
       </form>

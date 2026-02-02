@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Event, CreateEventInput, UpdateEventInput } from '../../models/event.model';
+import { Event, CreateEventInput } from '../../models/event.model';
 import { EventService } from '../../services/event.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -11,42 +11,43 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'app-calendar-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIconModule, MatButtonModule],
   templateUrl: './calendar-page.component.html',
   styleUrl: './calendar-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CalendarPageComponent implements OnInit, OnDestroy {
-  events: Event[] = [];
-  currentDate: Date = new Date();
-  currentMonth: string = '';
-  currentYear: number = 0;
+  events = signal<Event[]>([]);
+  currentDate = signal(new Date());
+  currentMonth = signal('');
+  currentYear = signal(0);
   
   // Calendar grid
   calendarDays: (number | null)[] = [];
   weekDays: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
   // Modal states
-  showEventModal = false;
-  showEventDetails = false;
-  selectedEvent: Event | null = null;
+  showEventModal = signal(false);
+  showEventDetails = signal(false);
+  selectedEvent = signal<Event | null>(null);
+
+  // Form data (reactive form)
+  eventForm: FormGroup;
+
+  isCreatingEvent = signal(false);
   
-  // Form data
-  newEventData: CreateEventInput = {
-    title: '',
-    description: '',
-    date: new Date().toISOString().slice(0, 16)
-  };
-  
-  isCreatingEvent = false;
-  currentUser = { id: '1', username: 'John Doe' }; // Static user for demo
-  
-  upcomingEvents: Event[] = [];
-  currentMonthEvents: Event[] = [];
+  upcomingEvents = signal<Event[]>([]);
+  currentMonthEvents = signal<Event[]>([]);
   
   private destroy$ = new Subject<void>();
 
-  constructor(private eventService: EventService) {}
+  constructor(private eventService: EventService, private fb: FormBuilder) {
+    this.eventForm = this.fb.group({
+      title: ['', Validators.required],
+      description: [''],
+      date: [new Date().toISOString().slice(0, 16), Validators.required]
+    });
+  }
 
   ngOnInit(): void {
     this.loadEvents();
@@ -57,28 +58,30 @@ export class CalendarPageComponent implements OnInit, OnDestroy {
     this.eventService.getAllEvents()
       .pipe(takeUntil(this.destroy$))
       .subscribe(events => {
-        this.events = events;
-        this.upcomingEvents = this.eventService.getUpcomingEvents();
+        console.log('Loaded events:', events);
+        this.events.set(events);
+        this.upcomingEvents.set(this.eventService.getUpcomingEvents(events));
         this.loadMonthEvents();
       });
   }
 
   loadMonthEvents(): void {
-    this.eventService.getEventsByMonth(this.currentDate)
+    this.eventService.getEventsByMonth(this.currentDate())
       .pipe(takeUntil(this.destroy$))
       .subscribe(events => {
-        this.currentMonthEvents = events.sort((a, b) => {
+        this.currentMonthEvents.set(events.sort((a, b) => {
           return new Date(a.date).getTime() - new Date(b.date).getTime();
-        });
+        }));
       });
   }
 
   generateCalendar(): void {
-    const year = this.currentDate.getFullYear();
-    const month = this.currentDate.getMonth();
-    
-    this.currentYear = year;
-    this.currentMonth = this.currentDate.toLocaleString('default', { month: 'long' });
+    const activeDate = this.currentDate();
+    const year = activeDate.getFullYear();
+    const month = activeDate.getMonth();
+
+    this.currentYear.set(year);
+    this.currentMonth.set(activeDate.toLocaleString('default', { month: 'long' }));
     
     // First day of month and number of days
     const firstDay = new Date(year, month, 1).getDay();
@@ -99,19 +102,21 @@ export class CalendarPageComponent implements OnInit, OnDestroy {
   }
 
   previousMonth(): void {
-    this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() - 1);
+    const current = this.currentDate();
+    this.currentDate.set(new Date(current.getFullYear(), current.getMonth() - 1));
     this.generateCalendar();
     this.loadMonthEvents();
   }
 
   nextMonth(): void {
-    this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1);
+    const current = this.currentDate();
+    this.currentDate.set(new Date(current.getFullYear(), current.getMonth() + 1));
     this.generateCalendar();
     this.loadMonthEvents();
   }
 
   today(): void {
-    this.currentDate = new Date();
+    this.currentDate.set(new Date());
     this.generateCalendar();
     this.loadMonthEvents();
   }
@@ -119,74 +124,72 @@ export class CalendarPageComponent implements OnInit, OnDestroy {
   getEventsForDay(day: number | null): Event[] {
     if (!day) return [];
     
-    const dateStr = new Date(this.currentYear, this.currentDate.getMonth(), day)
+    const dateStr = new Date(this.currentYear(), this.currentDate().getMonth(), day)
       .toDateString();
     
-    return this.events.filter(event => {
+    return this.events().filter(event => {
       return new Date(event.date).toDateString() === dateStr;
     });
   }
 
   selectDay(day: number | null): void {
     if (day) {
-      const selectedDate = new Date(this.currentYear, this.currentDate.getMonth(), day);
-      this.newEventData.date = selectedDate.toISOString().slice(0, 16);
+      const selectedDate = new Date(this.currentYear(), this.currentDate().getMonth(), day);
     }
   }
 
   openAddEventModal(): void {
     const now = new Date();
-    this.newEventData = {
+    this.eventForm.reset({
       title: '',
       description: '',
       date: now.toISOString().slice(0, 16)
-    };
-    this.showEventModal = true;
+    });
+    this.showEventModal.set(true);
   }
 
   closeAddEventModal(): void {
-    this.showEventModal = false;
+    this.showEventModal.set(false);
   }
 
   openEventDetails(event: Event): void {
-    this.selectedEvent = event;
-    this.showEventDetails = true;
+    this.selectedEvent.set(event);
+    this.showEventDetails.set(true);
   }
 
   closeEventDetails(): void {
-    this.showEventDetails = false;
-    this.selectedEvent = null;
+    this.showEventDetails.set(false);
+    this.selectedEvent.set(null);
   }
 
-  onEventInputChange(field: keyof CreateEventInput, value: string): void {
-    this.newEventData[field] = value;
-  }
+  // No longer needed: onEventInputChange
 
   handleCreateEvent(): void {
-    if (!this.newEventData.title.trim()) {
-      alert('Please enter an event title');
+    if (this.eventForm.invalid) {
+      this.eventForm.markAllAsTouched();
+      alert('Please fill in all required fields');
       return;
     }
-
-    this.isCreatingEvent = true;
-
-    this.eventService.createEvent(this.newEventData, this.currentUser)
+    this.isCreatingEvent.set(true);
+    const formValue = this.eventForm.value;
+    this.eventService.createEvent(formValue)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           alert('Event created successfully!');
           this.closeAddEventModal();
-          this.isCreatingEvent = false;
+          this.isCreatingEvent.set(false);
           this.loadEvents();
         },
         error: (err) => {
           alert('Error creating event: ' + err.message);
-          this.isCreatingEvent = false;
+          this.isCreatingEvent.set(false);
         }
       });
   }
 
-  handleDeleteEvent(event: Event): void {
+  handleDeleteEvent(event: Event | null): void {
+    if (!event) return;
     if (!confirm(`Are you sure you want to delete "${event.title}"?`)) {
       return;
     }
@@ -236,18 +239,20 @@ export class CalendarPageComponent implements OnInit, OnDestroy {
     if (!day) return false;
     
     const today = new Date();
+    const activeDate = this.currentDate();
     return (
       day === today.getDate() &&
-      this.currentDate.getMonth() === today.getMonth() &&
-      this.currentDate.getFullYear() === today.getFullYear()
+      activeDate.getMonth() === today.getMonth() &&
+      activeDate.getFullYear() === today.getFullYear()
     );
   }
 
   isCurrentMonth(): boolean {
     const today = new Date();
+    const activeDate = this.currentDate();
     return (
-      this.currentDate.getMonth() === today.getMonth() &&
-      this.currentDate.getFullYear() === today.getFullYear()
+      activeDate.getMonth() === today.getMonth() &&
+      activeDate.getFullYear() === today.getFullYear()
     );
   }
 

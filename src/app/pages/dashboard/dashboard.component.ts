@@ -8,6 +8,7 @@ import { Task } from '../../models/task.model';
 import { Event } from '../../models/event.model';
 import { Stats, ChartData } from '../../models/stats.model';
 import { TaskService } from '../../services/task.service';
+import { EventService } from '../../services/event.service';
 import { UserService } from '../../services/user.service';
 import { CalendarPageComponent } from "../calendar/calendar-page.component";
 import { ChartComponent } from "../../components/chart/chart.component";
@@ -24,6 +25,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
   private eventSource?: EventSource;
   private taskService = inject(TaskService);
+  private eventService = inject(EventService);
   private userService = inject(UserService);
   
   loading = signal(false);
@@ -59,6 +61,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.token = localStorage.getItem('accessToken');
 
     this.fetchTasks();
+    this.fetchEvents();
     this.fetchUsernames();
     this.setupSse();
   }
@@ -85,6 +88,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.error.set('Failed to load tasks');
         this.loading.set(false);
         console.error(err);
+      }
+    });
+    this.subscriptions.add(sub);
+  }
+
+  fetchEvents(): void {
+    const sub = this.eventService.getEventsByDay(new Date()).subscribe({
+      next: (events) => {
+        this.todayEvents.set(events);
+      },
+      error: (err) => {
+        console.error('Failed to load events', err);
       }
     });
     this.subscriptions.add(sub);
@@ -154,7 +169,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   isEventCreatedByMe(event: Event): boolean {
-    return event.createdBy === this.user?.id;
+    return event.createdBy?.id === this.user?.id;
   }
 
   formatTime(dateString: string): string {

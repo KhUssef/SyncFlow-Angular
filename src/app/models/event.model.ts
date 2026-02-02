@@ -1,13 +1,12 @@
 export interface Event {
-  id: string;
+  id: number | string;
   title: string;
   description: string;
   date: string; // ISO format: YYYY-MM-DDTHH:mm
   createdBy: {
-    id: string;
+    id: number | string;
     username: string;
   };
-  createdAt?: string;
 }
 
 export interface CreateEventInput {
