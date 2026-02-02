@@ -24,17 +24,18 @@ export class SignupComponent {
   ErrorMessage = signal('');
   isSubmitting = signal(false);
   formValid = signal(false);
-  
+  showModal = signal(false);
+
   private router = inject(Router);
   private http = inject(HttpClient);
   private fb = inject(FormBuilder);
-  private companyCode = signal<string>('');
+  companyCode = signal<string>('');
   private companyService = inject(CompanyService);
   private authService = inject(AuthService);
 
   constructor() {
     this.signupForm = this.fb.group({
-      companyName: ['', [Validators.required],  [this.companyNameValidator.bind(this)]],
+      companyName: ['', [Validators.required], [this.companyNameValidator.bind(this)]],
       username: ['', [Validators.required, Validators.minLength(3)]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
@@ -56,7 +57,7 @@ export class SignupComponent {
 
     return timer(500).pipe(
       take(1),
-      switchMap(() => 
+      switchMap(() =>
         this.http.get<any>(`http://localhost:3000/company/${control.value}`).pipe(
           map((response) => {
             console.log('Company validation response:', response);
@@ -66,7 +67,7 @@ export class SignupComponent {
           catchError((error) => {
             console.log('Company validation error:', error.status);
             if (error.status === 404) {
-              return of(null); 
+              return of(null);
             }
             return of({ serverError: true });
           })
@@ -79,16 +80,16 @@ export class SignupComponent {
     if (this.signupForm.valid && !this.isSubmitting()) {
       this.isSubmitting.set(true);
       const { companyName, username, password } = this.signupForm.value;
-      
+
       this.companyService.createCompany(companyName, username, password).subscribe({
         next: (response) => {
           this.companyCode.set(response.code);
           this.displaySuccessMessage(username, response.code);
-          
+
           // Reset form after 2 seconds
           setTimeout(async () => {
             this.authService.login(username, password, response.code).subscribe((value: any) => {
-              if(value){
+              if (value) {
                 this.router.navigate(['/dashboard']);
               }
             });
@@ -105,10 +106,8 @@ export class SignupComponent {
   }
 
   displaySuccessMessage(username: string, companyCode: string) {
-    this.successMessage.set(
-      `Company created successfully! Your company code is: ${companyCode}. Use username "${username}" to log in.`
-    );
-    this.showSuccessMessage.set(true);
+    this.companyCode.set(companyCode);
+    this.showModal.set(true);
   }
 
   displayErrorMessage(message: string) {
@@ -118,6 +117,10 @@ export class SignupComponent {
 
   renavigateToLogin(): void {
     this.router.navigate(['/login']);
+  }
+
+  closeModal(): void {
+    this.showModal.set(false);
   }
 
   get companyName() {
