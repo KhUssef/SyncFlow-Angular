@@ -1,0 +1,186 @@
+<div class="page-container">
+  <!-- Header -->
+  <header class="page-header">
+    <div>
+      <h1>EVENT CALENDAR</h1>
+      <p>Manage and view your events</p>
+    </div>
+    <div class="current-date">
+      {{ (currentDate() | date: 'EEEE, MMMM d, yyyy') }}
+    </div>
+  </header>
+
+  <!-- Content Wrapper -->
+  <div class="content-wrapper">
+    <!-- Calendar Section -->
+    <div class="calendar-section">
+      <div class="section-header">
+        <h2>Calendar</h2>
+        <button class="add-event-button" (click)="openAddEventModal()">
+          + ADD EVENT
+        </button>
+      </div>
+
+      <!-- Calendar Navigation -->
+      <div class="calendar-controls">
+        <button class="nav-button" (click)="previousMonth()">← Previous</button>
+        <div class="month-year">
+          <h3>{{ currentMonth() }} {{ currentYear() }}</h3>
+          <button class="today-button" (click)="today()">Today</button>
+        </div>
+        <button class="nav-button" (click)="nextMonth()">Next →</button>
+      </div>
+
+      <!-- Calendar Grid -->
+      <div class="calendar-grid">
+        <!-- Week day headers -->
+        <div class="calendar-header">
+          <div *ngFor="let day of weekDays" class="week-day-header">
+            {{ day }}
+          </div>
+        </div>
+
+        <!-- Calendar days -->
+        <div class="calendar-body">
+          <div *ngFor="let day of calendarDays" 
+               class="calendar-day"
+               [class.empty]="!day"
+               [class.today]="isToday(day)"
+               (click)="day ? selectDay(day) : null">
+            
+            <div *ngIf="day" class="day-number">{{ day }}</div>
+            
+            <div *ngIf="day" class="day-events">
+              <div *ngFor="let event of getEventsForDay(day)" 
+                   class="day-event-dot"
+                   (click)="openEventDetails(event); $event.stopPropagation()"
+                   [title]="event.title">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Events Section -->
+    <div class="upcoming-events-section">
+      <div class="section-header">
+        <h2>Events</h2>
+      </div>
+
+      <div class="events-list">
+        <div *ngIf="currentMonthEvents().length === 0" class="no-events">
+          No events in {{ currentMonth() }}
+        </div>
+
+        <div *ngFor="let event of currentMonthEvents()" 
+             class="event-card"
+             (click)="openEventDetails(event)">
+          <div class="event-date">
+            {{ formatEventDate(event.date) }}
+          </div>
+          <div class="event-time">
+            {{ formatEventTime(event.date) }}
+          </div>
+          <h3 class="event-title">{{ event.title }}</h3>
+          <div class="event-assigned">
+            👤 {{ event.createdBy.username || 'Unknown user' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Details Modal -->
+  <div *ngIf="showEventDetails() && selectedEvent()" class="event-details-overlay" (click)="closeEventDetails()">
+    <div class="event-details-card" (click)="$event.stopPropagation()">
+      <button class="close-button" (click)="closeEventDetails()">×</button>
+      
+      <h2 class="details-title">{{ selectedEvent()?.title }}</h2>
+      
+      <div class="details-section">
+        <label class="details-label">DATE & TIME:</label>
+        <div class="details-content">
+          {{ formatFullDateTime(selectedEvent()?.date || "") }}
+        </div>
+      </div>
+
+      <div class="details-section">
+        <label class="details-label">CREATED BY:</label>
+        <div class="details-content">
+          {{ selectedEvent()?.createdBy?.username || 'Unknown user' }}
+        </div>
+      </div>
+
+      <div *ngIf="selectedEvent()?.description" class="details-section">
+        <label class="details-label">DESCRIPTION:</label>
+        <div class="details-content">
+          {{ selectedEvent()?.description }}
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="delete-button" (click)="handleDeleteEvent(selectedEvent())">
+          DELETE
+        </button>
+        <button class="close-modal-button" (click)="closeEventDetails()">
+          CLOSE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Event Modal -->
+  <div *ngIf="showEventModal()" class="event-details-overlay" (click)="closeAddEventModal()">
+    <div class="event-details-card" (click)="$event.stopPropagation()">
+      <button class="close-button" (click)="closeAddEventModal()">×</button>
+      
+      <h2 class="details-title">Create New Event</h2>
+
+      <form [formGroup]="eventForm" (ngSubmit)="handleCreateEvent()">
+        <div class="details-section">
+          <label class="details-label">Title *</label>
+          <input
+            type="text"
+            class="input-field"
+            formControlName="title"
+            placeholder="Enter event title"
+            required
+          />
+        </div>
+
+        <div class="details-section">
+          <label class="details-label">Date & Time</label>
+          <input
+            type="datetime-local"
+            class="input-field"
+            formControlName="date"
+          />
+        </div>
+
+        <div class="details-section">
+          <label class="details-label">Description</label>
+          <textarea
+            class="textarea-field"
+            formControlName="description"
+            placeholder="Enter event description (optional)"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-button" (click)="closeAddEventModal()">
+            CANCEL
+          </button>
+          <button 
+            type="submit" 
+            class="save-button"
+            [disabled]="isCreatingEvent() || eventForm.invalid"
+          >
+            {{ isCreatingEvent() ? 'CREATING...' : 'CREATE EVENT' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
