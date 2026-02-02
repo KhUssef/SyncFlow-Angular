@@ -1,0 +1,80 @@
+<div class="container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebarHeader">
+      <h2 class="sidebarTitle">Chats</h2>
+      <button *ngIf="isManager" (click)="showCreateChat = true" class="newChatButton">New Chat</button>
+    </div>
+
+    <!-- Create Chat Modal -->
+    <div *ngIf="showCreateChat" class="modalOverlay">
+      <div class="modal">
+        <h3 class="modalTitle">Create New Chat</h3>
+        <input class="modalInput" placeholder="Chat name..." [(ngModel)]="newChatName" (keyup.enter)="createChat()" />
+        <div class="modalButtons">
+          <button class="createButton" (click)="createChat()">Create</button>
+          <button class="cancelButton" (click)="showCreateChat = false">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="chatList">
+      <div *ngFor="let chat of (chats$ | async)" (click)="selectChat(chat)" [class.chatItemActive]="selectedChat()?.id === chat.id" class="chatItem">
+        <div class="chatItemContent">
+          <div class="chatItemMain">
+            <h4 class="chatItemTitle" [class.chatItemTitleActive]="selectedChat()?.id === chat.id">{{ chat.name }}</h4>
+            <p *ngIf="chat.lastMessage" class="chatItemLastMessage">{{ chat.lastMessage.senderUsername }}: {{ chat.lastMessage.content }}</p>
+            <span class="chatItemCount">{{ chat.messageCount }} messages</span>
+          </div>
+          <button *ngIf="isManager" (click)="$event.stopPropagation(); deleteChat(chat.id)" class="deleteButton">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="connectedUsers">
+      <h4 class="connectedUsersTitle">Connected Users ({{ connectedUsers().length }})</h4>
+      <div class="connectedUsersList">
+        <div *ngFor="let u of connectedUsers()" class="connectedUser">
+          <div class="onlineIndicator"></div>
+          {{ u.username }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Chat Area -->
+  <div class="chatArea">
+    <ng-container *ngIf="selectedChat(); else emptyState">
+      <div class="chatHeader">
+        <h2 class="chatHeaderTitle">{{ selectedChat()?.name }}</h2>
+      </div>
+
+      <div class="messagesContainer">
+        <div *ngFor="let message of messages()" class="messageWrapper" [class.messageWrapperSent]="message.sender.id === +(user?.id || '')" [class.messageWrapperReceived]="message.sender.id !== +(user?.id || '')">
+          <div class="message" [class.messageSent]="message.sender.id === +(user?.id || '')" [class.messageReceived]="message.sender.id !== +(user?.id || '')">
+            <div *ngIf="message.sender.id !== +(user?.id || '')" class="messageSender">{{ message.sender.username }}</div>
+            <div class="messageContent">{{ message.content }}</div>
+            <div class="messageTime">{{ message.createdAt | date:'shortTime' }}</div>
+          </div>
+        </div>
+
+        <div class="typingIndicator" *ngIf="false"></div>
+        <div style="height:1px;" #messagesEnd></div>
+      </div>
+
+      <div class="messageInputContainer">
+        <div class="messageInputWrapper">
+          <input class="messageInput" placeholder="Type a message..." [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" />
+          <button class="sendButton" [disabled]="!newMessage.trim()" (click)="sendMessage()">Send</button>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #emptyState>
+      <div class="emptyState">
+        <div class="emptyStateIcon">💬</div>
+        Select a chat to start messaging
+      </div>
+    </ng-template>
+  </div>
+</div>
