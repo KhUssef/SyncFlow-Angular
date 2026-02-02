@@ -1,0 +1,62 @@
+<div class="sidebar" [class.collapsed]="collapsed">
+  <nav class="nav">
+    <ul>
+      <li class="nav-item">
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+          <mat-icon class="icon">home</mat-icon>
+          <span *ngIf="!collapsed" class="text">Dashboard</span>
+        </a>
+      </li>
+
+      <li *ngIf="isManager()" class="nav-item">
+        <a routerLink="/users" routerLinkActive="active" class="nav-link">
+          <mat-icon class="icon">people</mat-icon>
+          <span *ngIf="!collapsed" class="text">Members</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/calendar" routerLinkActive="active" class="nav-link">
+          <mat-icon class="icon">calendar_today</mat-icon>
+          <span *ngIf="!collapsed" class="text">Calendar</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/chat" class="nav-link">
+          <mat-icon class="icon">chat</mat-icon>
+          <span *ngIf="!collapsed" class="text">Chat</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/notes" class="nav-link">
+          <mat-icon class="icon">note</mat-icon>
+          <span *ngIf="!collapsed" class="text">Notes</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/tasks" routerLinkActive="active" class="nav-link">
+          <mat-icon class="icon">assignment</mat-icon>
+          <span *ngIf="!collapsed" class="text">Tasks</span>
+        </a>
+      </li>
+
+      
+
+      <li class="nav-item" (click)="handleLogout()">
+        <div class="nav-link">
+          <mat-icon class="icon">logout</mat-icon>
+          <span *ngIf="!collapsed" class="text">Logout</span>
+        </div>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="collapse-btn" (click)="toggleSidebar()">
+    <mat-icon *ngIf="!collapsed">chevron_left</mat-icon>
+    <mat-icon *ngIf="collapsed">chevron_right</mat-icon>
+  </div>
+
+</div>
