@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { User, CreateUserInput, UpdateUserInput } from '../../models/user.model';
 import { UserService } from '../../services/user.service';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -22,6 +22,8 @@ export class UsersPageComponent implements OnInit, OnDestroy {
   searchTerm = signal('');
   selectedRole = signal('');
   showDeleted = signal(false);
+  companyCode$ = new BehaviorSubject<string>('');
+
 
   filteredUsers = computed(() => {
     const data = this.showDeleted() ? this.deletedUsers() : this.users();
@@ -64,7 +66,21 @@ export class UsersPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadUsers();
+    this.userService.getCompanyCode().subscribe(code => {
+      console.log('Fetched company code:', code);
+      this.companyCode$.next(code.companyCode);
+    });
+    
   }
+  copyCompanyCode(): void {
+      const code = this.companyCode$.value;
+      if (code) {
+        navigator.clipboard.writeText(code);
+        alert('Company code copied: ' + code);
+      } else {
+        alert('No company code available');
+      }
+    }
 
   loadUsers(): void {
     this.userService.getCompanyUsers()

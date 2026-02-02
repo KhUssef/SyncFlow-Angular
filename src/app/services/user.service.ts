@@ -74,4 +74,9 @@ export class UserService {
   connectToEvents(): EventSource {
     return new EventSource(`${this.baseUrl}/events`);
   }
+
+
+  getCompanyCode(): Observable<{ companyCode: string }> {
+    return this.http.get<{ companyCode: string }>(`http://localhost:3000/auth/company-code`);
+  }
 }
