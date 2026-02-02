@@ -1,0 +1,233 @@
+/* dashboard.component.css */
+.dashboard-container {
+  background-color: #ffffff;
+  color: #000000;
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #000000;
+  padding-bottom: 1rem;
+}
+
+.dashboard-header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.current-date {
+  color: #000000;
+  font-size: 0.9rem;
+}
+
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background-color: #ffffff;
+  border-radius: 0;
+  padding: 1.2rem;
+  border: 2px solid #000000;
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-card h3 {
+  font-size: 0.9rem;
+  color: #000000;
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #000000;
+}
+
+.chart-container {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 2px solid #000000;
+}
+
+.chart-container h2 {
+  font-size: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #000000;
+}
+
+.chart-wrapper {
+  height: 300px;
+  width: 100%;
+}
+
+.today-section {
+  margin-top: 2rem;
+  background-color: #ffffff;
+  padding: 1.5rem 2rem;
+   border: 2px solid #000000;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.today-section:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.today-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #333333;
+  
+  padding-bottom: 0.5rem;
+}
+
+.today-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.today-section li {
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+   border: 2px solid #000000;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  transition: background-color 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.today-section li:hover {
+  background-color: #f1f1f1;
+}
+
+.today-section li.assigned-to-me {
+  background-color: #e6fffa;
+  border-left: 4px solid #38b2ac;
+  padding: 12px;
+  border: 1px solid #38b2ac;
+  border-radius: 6px;
+  color: #234e52;
+}
+
+.today-section li.not-assigned-to-me {
+  background-color: #f7fafc;
+  border-left: 4px solid #a0aec0;
+  padding: 12px;
+  border: 1px solid #a0aec0;
+  border-radius: 6px;
+  color: #2d3748;
+}
+
+.task-title {
+  font-weight: 600;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.task-status {
+  font-size: 0.875rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.task-status.completed {
+  background-color: #c6f6d5;
+  color: #22543d;
+}
+
+.task-status.pending {
+  background-color: #fed7d7;
+  color: #742a2a;
+}
+
+.add-button {
+  padding: 12px 24px;
+  background-color: #000;
+  color: #fff;
+  border: 2px solid #000;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-button:hover:not(:disabled) {
+  background-color: #fff;
+  color: #000;
+  box-shadow: 4px 4px 0 #000;
+  transform: translate(-2px, -2px);
+}
+
+.add-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loading,
+.error {
+  padding: 20px;
+  text-align: center;
+  font-size: 1.2rem;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error {
+  color: #e74c3c;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .dashboard-header h1 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-container {
+    grid-template-columns: 1fr;
+  }
+}

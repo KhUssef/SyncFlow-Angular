@@ -1,0 +1,121 @@
+<!-- dashboard.component.html -->
+<div class="dashboard-container" *ngIf="!loading() && !error()">
+  <header class="dashboard-header">
+    <h1>Workspace Management Dashboard</h1>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <button
+        (click)="openAddTaskModal()"
+        [disabled]="createTaskLoading()"
+        class="add-button"
+      >
+        {{ createTaskLoading() ? 'Creating...' : '+ Add Task' }}
+      </button>
+      <div class="current-date">
+        {{ currentDate | date:'EEEE, MMMM d, y' }}
+        <span style="font-size: 0.8em; color: #666; margin-left: 10px;">
+          Last updated: {{ lastRefresh | date:'shortTime' }}
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Stats Section -->
+  <div class="stats-container">
+    <div class="stat-card">
+      <h3>Total Tasks</h3>
+      <p class="stat-number">{{ stats().totalTasks }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Completed</h3>
+      <p class="stat-number">{{ stats().completedTasks }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Pending</h3>
+      <p class="stat-number">{{ stats().pendingTasks }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Completion Rate</h3>
+      <p class="stat-number">{{ stats().completionRate }}%</p>
+    </div>
+  </div>
+
+  <!-- Chart Section -->
+  <div class="chart-container">
+    <h2>Tasks Completed by Day (Last 7 Days)</h2>
+    <app-chart [chartData]="chartData()"></app-chart>
+  </div>
+  
+  <!-- Today's Tasks and Events -->
+  <div class="today-section">
+    <h2>Today's Tasks</h2>
+    <ul *ngIf="todayTasks().length > 0; else noTasks">
+      <li
+        *ngFor="let task of todayTasks()"
+        [ngClass]="{
+          'assigned-to-me': isTaskAssignedToMe(task),
+          'not-assigned-to-me': !isTaskAssignedToMe(task)
+        }"
+      >
+        <span class="task-title">
+          {{ task.title }}
+          <span *ngIf="!isTaskAssignedToMe(task) && !task.completed">
+            ({{ task.assignedTo?.username }})
+          </span>
+        </span>
+        <span
+          class="task-status"
+          [ngClass]="task.completed ? 'completed' : 'pending'"
+        >
+          {{ task.completed ? 'Completed' : 'Pending' }}
+        </span>
+      </li>
+    </ul>
+    <ng-template #noTasks>
+      <p>No tasks due today.</p>
+    </ng-template>
+
+    <h2 style="margin-top: 2rem;">Today's Events</h2>
+    <ul *ngIf="todayEvents().length > 0; else noEvents">
+      <li
+        *ngFor="let event of todayEvents()"
+        [ngClass]="{
+          'assigned-to-me': isEventCreatedByMe(event),
+          'not-assigned-to-me': !isEventCreatedByMe(event)
+        }"
+      >
+        <span class="task-title">
+          {{ event.title }}
+          <span *ngIf="!isEventCreatedByMe(event)">
+            ({{ event.createdBy.username }})
+          </span>
+        </span>
+        <span class="task-status">
+          {{ formatTime(event.date) }}
+        </span>
+      </li>
+    </ul>
+    <ng-template #noEvents>
+      <p>No events today.</p>
+    </ng-template>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div class="loading" *ngIf="loading()">
+  Loading dashboard data...
+</div>
+
+<!-- Error State -->
+<div class="error" *ngIf="error()">
+  {{ error() }}
+</div>
+
+<!-- Add Task Modal -->
+<app-add-task-modal
+  *ngIf="isAddTaskModalOpen()"
+  [users]="users()"
+  [loading]="usersLoading()"
+  (close)="closeAddTaskModal()"
+  (taskSubmit)="handleCreateTask($event)"
+>
+</app-add-task-modal>
