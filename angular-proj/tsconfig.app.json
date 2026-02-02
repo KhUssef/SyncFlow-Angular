@@ -8,7 +8,7 @@
   },
   "include": [
     "src/**/*.ts"
-  ],
+, "src/app/routes.config"  ],
   "exclude": [
     "src/**/*.spec.ts"
   ]
