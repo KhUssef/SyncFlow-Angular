@@ -65,7 +65,7 @@ export class UserService {
    * Recover a deleted user
    */
   recoverUser(id: number): Observable<User> {
-    return this.http.post<User>(`${this.baseUrl}/${id}/recover`, {});
+    return this.http.post<User>(`${this.baseUrl}/recover/${id}`, {});
   }
 
   /**

@@ -30,6 +30,7 @@ export class AuthService {
   /* here both the behaviour subjcts are obsolete:
   the only reason they are being kept is in case in the future we need to access the user data without it being a signal
   and to use behaviour subject lol*/
+  
   private readonly isManagerSubject = new BehaviorSubject<boolean>(false);
   readonly isManager$ = this.isManagerSubject.asObservable();
   
