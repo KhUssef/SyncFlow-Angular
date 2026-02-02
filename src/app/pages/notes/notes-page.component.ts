@@ -229,7 +229,7 @@ export class NotesPageComponent implements OnInit, OnDestroy {
     if (this.currentLock && this.currentLock.lineNumber === lineNumber) return;
     console.log(`Requesting lock for line ${lineNumber}`);
     this.selectedLine.set(lineNumber);
-    this.refreshLinesIfTail(lineNumber);
+    // this.refreshLinesIfTail(lineNumber);
     this.socket?.emit('softlock', { lineNumber }, (response: { success: boolean; lockedBy?: string }) => {
       if (response.success) {
         this.currentLock = { noteNumber: this.selectedNoteId()!, lineNumber };
@@ -326,8 +326,10 @@ export class NotesPageComponent implements OnInit, OnDestroy {
     const lines = this.noteLines();
     if (!lines.length) return;
     const maxLine = Math.max(...lines.map((l) => l.lineNumber));
-    const isInLastTen = lineNumber >= maxLine - 9;
+    const isInLastTen = lineNumber >= maxLine - 3;
+    
     if (isInLastTen && !this.linesLoading()) {
+      this.socket?.emit('softlock', { lineNumber });
       this.loadLines(noteId);
     }
   }
