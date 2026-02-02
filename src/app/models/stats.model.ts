@@ -1,3 +1,5 @@
+import { Task } from './task.model';
+
 export interface Stats {
   totalTasks: number;
   completedTasks: number;
@@ -16,4 +18,11 @@ export interface ChartData {
 export interface ChartSeries {
   name: string;
   series: Array<{ name: string; value: number }>;
+}
+
+export interface DashboardData {
+  tasks: Task[];
+  chartData: ChartData[];
+  stats: Stats;
+  todayTasks: Task[];
 }

@@ -15,7 +15,7 @@ export class AddTaskModalComponent {
   @Input() users: {id:number, username:string}[] = [];
   @Input() loading = false;
   @Output() close = new EventEmitter<void>();
-  @Output() submit = new EventEmitter<any>();
+  @Output() taskSubmit = new EventEmitter<any>();
 
   taskForm: FormGroup;
 
@@ -36,7 +36,7 @@ export class AddTaskModalComponent {
         assignedToId: formValue.assignedToId || null
       };
       
-      this.submit.emit(taskData);
+      this.taskSubmit.emit(taskData);
       this.taskForm.reset();
     } else {
       alert('Task title is required');

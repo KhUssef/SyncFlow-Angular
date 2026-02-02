@@ -42,25 +42,9 @@
   <!-- Chart Section -->
   <div class="chart-container">
     <h2>Tasks Completed by Day (Last 7 Days)</h2>
-    <div class="chart-wrapper">
-      <ngx-charts-line-chart
-        [view]="chartOptions.view"
-        [scheme]="chartOptions.colorScheme"
-        [results]="getChartSeriesData()"
-        [gradient]="chartOptions.gradient"
-        [xAxis]="chartOptions.showXAxis"
-        [yAxis]="chartOptions.showYAxis"
-        [legend]="chartOptions.showLegend"
-        [showXAxisLabel]="chartOptions.showXAxisLabel"
-        [showYAxisLabel]="chartOptions.showYAxisLabel"
-        [xAxisLabel]="chartOptions.xAxisLabel"
-        [yAxisLabel]="chartOptions.yAxisLabel"
-        [timeline]="chartOptions.timeline"
-      >
-      </ngx-charts-line-chart>
-    </div>
+    <app-chart [chartData]="chartData()"></app-chart>
   </div>
-
+  
   <!-- Today's Tasks and Events -->
   <div class="today-section">
     <h2>Today's Tasks</h2>
@@ -132,6 +116,6 @@
   [users]="users()"
   [loading]="usersLoading()"
   (close)="closeAddTaskModal()"
-  (submit)="handleCreateTask($event)"
+  (taskSubmit)="handleCreateTask($event)"
 >
 </app-add-task-modal>

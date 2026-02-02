@@ -27,6 +27,9 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   readonly user$ = this.userSubject.asObservable();
 
+  /* here both the behaviour subjcts are obsolete:
+  the only reason they are being kept is in case in the future we need to access the user data without it being a signal
+  and to use behaviour subject lol*/
   private readonly isManagerSubject = new BehaviorSubject<boolean>(false);
   readonly isManager$ = this.isManagerSubject.asObservable();
   
@@ -37,7 +40,6 @@ export class AuthService {
   private readonly router = inject(Router);
 
   constructor() {
-    // Hydrate auth state when the app bootstraps
     this.checkauthstatus();
   }
 
@@ -67,8 +69,8 @@ export class AuthService {
         
         this.refreshUser().subscribe();
         
-        this.router.navigate(['/dashboard']);
         this.loggedIn.set(true);
+        this.router.navigate(['/dashboard']);
         return true;
       }),
       catchError((error) => {
